@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
-import uz.com.onlineshop.model.user.UserEntity;
+import uz.com.onlineshop.model.entity.user.UserEntity;
 
 import java.util.Collection;
 import java.util.Date;
@@ -18,6 +18,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class JwtService {
+
     @Value("${jwt.secret.key}")
     private String secretKey;
 

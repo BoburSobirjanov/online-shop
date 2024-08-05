@@ -1,4 +1,4 @@
-package uz.com.onlineshop.model.user;
+package uz.com.onlineshop.model.entity.user;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,7 +8,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import uz.com.onlineshop.model.BaseEntity;
+import uz.com.onlineshop.model.entity.BaseEntity;
 
 import java.util.ArrayList;
 import java.util.Collection;

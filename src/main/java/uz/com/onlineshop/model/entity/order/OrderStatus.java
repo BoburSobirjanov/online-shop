@@ -1,4 +1,4 @@
-package uz.com.onlineshop.model.order;
+package uz.com.onlineshop.model.entity.order;
 
 import lombok.Getter;
 

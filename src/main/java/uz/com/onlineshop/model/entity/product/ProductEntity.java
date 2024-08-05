@@ -1,11 +1,13 @@
-package uz.com.onlineshop.model.product;
+package uz.com.onlineshop.model.entity.product;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
-import uz.com.onlineshop.model.BaseEntity;
-import uz.com.onlineshop.model.categories.Category;
+import uz.com.onlineshop.model.entity.BaseEntity;
+import uz.com.onlineshop.model.entity.categories.Category;
+
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,8 +35,7 @@ public class ProductEntity extends BaseEntity {
     @Column(nullable = false)
     private String model;
 
-    @ManyToOne
-    private Category categoryId;
+    private UUID categoryId;
 
     @Column(nullable = false)
     private Double weight;

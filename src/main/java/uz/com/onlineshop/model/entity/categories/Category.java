@@ -1,9 +1,9 @@
-package uz.com.onlineshop.model.categories;
+package uz.com.onlineshop.model.entity.categories;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.*;
-import uz.com.onlineshop.model.BaseEntity;
+import uz.com.onlineshop.model.entity.BaseEntity;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

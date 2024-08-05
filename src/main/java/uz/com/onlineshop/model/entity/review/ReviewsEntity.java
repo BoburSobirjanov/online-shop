@@ -1,11 +1,11 @@
-package uz.com.onlineshop.model.review;
+package uz.com.onlineshop.model.entity.review;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
-import uz.com.onlineshop.model.BaseEntity;
-import uz.com.onlineshop.model.user.UserEntity;
-import uz.com.onlineshop.model.product.ProductEntity;
+import uz.com.onlineshop.model.entity.BaseEntity;
+import uz.com.onlineshop.model.entity.user.UserEntity;
+import uz.com.onlineshop.model.entity.product.ProductEntity;
 
 @AllArgsConstructor
 @NoArgsConstructor

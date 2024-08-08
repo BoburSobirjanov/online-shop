@@ -31,4 +31,22 @@ public class UserController {
     ){
         return userService.deleteUser(id, principal);
     }
+
+    @PutMapping("/forgot-password")
+    public StandardResponse<String> forgotPassword(
+            @RequestParam String code,
+            @RequestParam String newPassword,
+            Principal principal
+    ){
+        return userService.forgotPassword(code, newPassword, principal);
+    }
+
+    @PutMapping("/{id}/assign-to-admin")
+    @PreAuthorize("hasRole('OWNER')")
+    public StandardResponse<UserForFront> assignToAdmin(
+            @PathVariable UUID id,
+            Principal principal
+    ){
+        return userService.assignToAdmin(id, principal);
+    }
 }

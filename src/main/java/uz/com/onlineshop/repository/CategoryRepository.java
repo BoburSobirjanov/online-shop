@@ -10,4 +10,6 @@ import java.util.UUID;
 public interface CategoryRepository extends JpaRepository<Category,UUID> {
     @Query("select u from categories as u where u.isDeleted=false and u.name=?1")
     Category findCategoryByName(String name);
+    @Query("select u from categories as u where u.isDeleted=false and u.id=?1")
+    Category findCategoryById(UUID id);
 }

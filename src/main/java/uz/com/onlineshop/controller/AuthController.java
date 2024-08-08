@@ -31,9 +31,9 @@ public class AuthController {
         return userService.signIn(loginDto);
     }
 
-    @GetMapping("/send/{email}")
+    @GetMapping("/send-verification")
     public StandardResponse<String> sendMessage(
-          @PathVariable String email
+          @RequestParam String email
     ){
       return  mailSendingService.sendMessage(email);
     }

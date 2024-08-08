@@ -13,7 +13,9 @@ import uz.com.onlineshop.model.dto.response.UserForFront;
 import uz.com.onlineshop.model.entity.user.Gender;
 import uz.com.onlineshop.model.entity.user.UserEntity;
 import uz.com.onlineshop.model.entity.user.UserRole;
+import uz.com.onlineshop.model.entity.user.VerificationEntity;
 import uz.com.onlineshop.repository.UserRepository;
+import uz.com.onlineshop.repository.VerificationRepository;
 import uz.com.onlineshop.response.JwtResponse;
 import uz.com.onlineshop.response.StandardResponse;
 import uz.com.onlineshop.response.Status;
@@ -31,7 +33,7 @@ public class UserService {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final MailSendingService mailSendingService;
+    private final VerificationRepository verificationRepository;
 
     public StandardResponse<JwtResponse> signUp (UserDto userDto){
        checkUserEmailAndPhoneNumber(userDto.getEmail(), userDto.getPhoneNumber());
@@ -127,6 +129,40 @@ public class UserService {
                 .data("DELETED")
                 .status(Status.SUCCESS)
                 .message("User deleted successfully!")
+                .build();
+    }
+
+    public StandardResponse<UserForFront> assignToAdmin(UUID id, Principal principal){
+        UserEntity userEntity = userRepository.findUserEntityById(id);
+        if (userEntity==null){
+            throw new DataNotFoundException("User not found!");
+        }
+        userEntity.setRole(UserRole.ADMIN);
+        userEntity.setChangeRoleBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
+        UserEntity save = userRepository.save(userEntity);
+        UserForFront userForFront = modelMapper.map(save, UserForFront.class);
+
+        return StandardResponse.<UserForFront>builder()
+                .data(userForFront)
+                .status(Status.SUCCESS)
+                .message("User's role changed")
+                .build();
+    }
+
+    public StandardResponse<String> forgotPassword(String code,String newPassword, Principal principal){
+        UserEntity userEntity = userRepository.findUserEntityByEmail(principal.getName());
+        VerificationEntity verification =  verificationRepository.findByUserEmailAndCode(userEntity.getId(),code);
+        if (!verification.getCode().equals(code)){
+            throw new NotAcceptableException("Verification code is incorrect!");
+        }
+        UserEntity user = userRepository.findUserEntityByEmail(principal.getName());
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return StandardResponse.<String>builder()
+                .data("CHANGED")
+                .status(Status.SUCCESS)
+                .message("Your password changed!")
                 .build();
     }
 }

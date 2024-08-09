@@ -2,6 +2,9 @@ package uz.com.onlineshop.service;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.com.onlineshop.exception.DataNotFoundException;
 import uz.com.onlineshop.exception.NotAcceptableException;
@@ -61,5 +64,23 @@ public class CategoryService {
                 .status(Status.SUCCESS)
                 .message("Category deleted")
                 .build();
+    }
+
+    public StandardResponse<CategoryForFront> getById(UUID id){
+        Category category = categoryRepository.findCategoryById(id);
+        if (category==null){
+            throw new DataNotFoundException("Category not found!");
+        }
+        CategoryForFront categoryForFront = modelMapper.map(category, CategoryForFront.class);
+        return StandardResponse.<CategoryForFront>builder()
+                .data(categoryForFront)
+                .status(Status.SUCCESS)
+                .message("This is category!")
+                .build();
+    }
+
+    public Page<CategoryForFront> getAllCategories(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        return categoryRepository.findAllCategories(pageable);
     }
 }

@@ -1,6 +1,7 @@
 package uz.com.onlineshop.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.com.onlineshop.model.dto.request.CategoryDto;
@@ -19,7 +20,7 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping("/save")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
     public StandardResponse<CategoryForFront> save(
             @RequestBody CategoryDto categoryDto
             ){
@@ -27,11 +28,24 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}/delete-by-id")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
     public StandardResponse<String> delete(
             @PathVariable UUID id,
             Principal principal
             ){
         return categoryService.delete(id, principal);
+    }
+
+    @GetMapping("/get-by-id/{id}")
+    public StandardResponse<CategoryForFront> getById(
+            @PathVariable UUID id
+    ){
+        return categoryService.getById(id);
+    }
+
+    @GetMapping("/get-all-categories")
+    public Page<CategoryForFront> getCategories(@RequestParam(defaultValue = "0") int page,
+                                           @RequestParam(defaultValue = "10") int size) {
+        return categoryService.getAllCategories(page, size);
     }
 }

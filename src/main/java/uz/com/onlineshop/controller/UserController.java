@@ -1,9 +1,12 @@
 package uz.com.onlineshop.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import uz.com.onlineshop.model.dto.request.user.UserDto;
 import uz.com.onlineshop.model.dto.response.UserForFront;
+import uz.com.onlineshop.model.entity.user.UserEntity;
 import uz.com.onlineshop.response.StandardResponse;
 import uz.com.onlineshop.service.UserService;
 
@@ -24,7 +27,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}/delete-by-id")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
     public StandardResponse<String> delete(
             @PathVariable UUID id,
             Principal principal
@@ -48,5 +51,21 @@ public class UserController {
             Principal principal
     ){
         return userService.assignToAdmin(id, principal);
+    }
+
+    @PutMapping("/update-profile/{id}")
+    public StandardResponse<UserForFront> updateProfile(
+            @PathVariable UUID id,
+            Principal principal,
+            @RequestBody UserDto userDto
+            ){
+        return userService.updateProfile(id, userDto, principal);
+    }
+
+    @GetMapping("/get-all-users")
+    @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
+    public Page<UserForFront> getUsers(@RequestParam(defaultValue = "0") int page,
+                                     @RequestParam(defaultValue = "10") int size) {
+        return userService.getAll(page, size);
     }
 }

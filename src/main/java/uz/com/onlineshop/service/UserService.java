@@ -2,6 +2,9 @@ package uz.com.onlineshop.service;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import uz.com.onlineshop.exception.DataNotFoundException;
@@ -164,5 +167,37 @@ public class UserService {
                 .status(Status.SUCCESS)
                 .message("Your password changed!")
                 .build();
+    }
+
+    public StandardResponse<UserForFront> updateProfile(UUID id, UserDto userDto,Principal principal){
+        UserEntity userEntity = userRepository.findUserEntityById(id);
+        if (userEntity==null){
+            throw new DataNotFoundException("User not found!");
+        }
+        userEntity.setEmail(userDto.getEmail());
+        userEntity.setAddress(userDto.getAddress());
+        userEntity.setUsername(userDto.getUsername());
+        userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        userEntity.setUpdatedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
+        userEntity.setFullName(userDto.getFullName());
+        userEntity.setPhoneNumber(userDto.getPhoneNumber());
+        try {
+            userEntity.setGender(Gender.valueOf(userDto.getGender()));
+        } catch (Exception e){
+            throw new NotAcceptableException("Invalid gender");
+        }
+        userEntity.setUpdatedTime(LocalDateTime.now());
+        UserEntity save = userRepository.save(userEntity);
+        UserForFront userForFront = modelMapper.map(save, UserForFront.class);
+        return StandardResponse.<UserForFront>builder()
+                .data(userForFront)
+                .status(Status.SUCCESS)
+                .message("User updated!")
+                .build();
+    }
+
+    public Page<UserForFront> getAll(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        return userRepository.findAllUsers(pageable);
     }
 }

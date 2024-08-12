@@ -1,11 +1,6 @@
 package uz.com.onlineshop.model.dto.request;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.ManyToOne;
 import lombok.*;
-import uz.com.onlineshop.model.entity.categories.Category;
-
-import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor

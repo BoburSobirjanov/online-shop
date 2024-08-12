@@ -17,6 +17,9 @@ public class AuthController {
     private final UserService userService;
     private final MailSendingService mailSendingService;
 
+
+
+
     @PostMapping("/sign-up")
     public StandardResponse<JwtResponse> signUp(
             @RequestBody UserDto userDto
@@ -24,12 +27,21 @@ public class AuthController {
         return userService.signUp(userDto);
     }
 
+
+
+
+
     @PostMapping("/sign-in")
     public StandardResponse<JwtResponse> signIn(
             @RequestBody LoginDto loginDto
             ){
         return userService.signIn(loginDto);
     }
+
+
+
+
+
 
     @GetMapping("/send-verification")
     public StandardResponse<String> sendMessage(

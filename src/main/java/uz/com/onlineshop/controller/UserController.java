@@ -18,6 +18,9 @@ import java.util.UUID;
 @RequestMapping("/api/v1/user")
 public class UserController {
 
+
+
+
     private final UserService userService;
     @GetMapping("/get-user-by-id/{id}")
     public StandardResponse<UserForFront> getById(
@@ -25,6 +28,10 @@ public class UserController {
             ){
         return userService.getById(id);
     }
+
+
+
+
 
     @DeleteMapping("/{id}/delete-by-id")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
@@ -35,6 +42,10 @@ public class UserController {
         return userService.deleteUser(id, principal);
     }
 
+
+
+
+
     @PutMapping("/forgot-password")
     public StandardResponse<String> forgotPassword(
             @RequestParam String code,
@@ -43,6 +54,10 @@ public class UserController {
     ){
         return userService.forgotPassword(code, newPassword, principal);
     }
+
+
+
+
 
     @PutMapping("/{id}/assign-to-admin")
     @PreAuthorize("hasRole('OWNER')")
@@ -53,6 +68,10 @@ public class UserController {
         return userService.assignToAdmin(id, principal);
     }
 
+
+
+
+
     @PutMapping("/update-profile/{id}")
     public StandardResponse<UserForFront> updateProfile(
             @PathVariable UUID id,
@@ -62,9 +81,13 @@ public class UserController {
         return userService.updateProfile(id, userDto, principal);
     }
 
+
+
+
+
     @GetMapping("/get-all-users")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
-    public Page<UserForFront> getUsers(@RequestParam(defaultValue = "0") int page,
+    public Page<UserEntity> getUsers(@RequestParam(defaultValue = "0") int page,
                                      @RequestParam(defaultValue = "10") int size) {
         return userService.getAll(page, size);
     }

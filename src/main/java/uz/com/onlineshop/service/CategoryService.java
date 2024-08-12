@@ -28,6 +28,11 @@ public class CategoryService {
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
 
+
+
+
+
+
     public StandardResponse<CategoryForFront> save(CategoryDto categoryDto){
         checkHasCategory(categoryDto.getName());
         Category category =  modelMapper.map(categoryDto, Category.class);
@@ -42,12 +47,25 @@ public class CategoryService {
                 .build();
     }
 
+
+
+
+
+
+
     private void checkHasCategory(String name) {
         Category category = categoryRepository.findCategoryByName(name);
         if (category!=null){
             throw new NotAcceptableException("Category has already added!");
         }
     }
+
+
+
+
+
+
+
 
     public StandardResponse<String> delete(UUID id, Principal principal){
         Category category = categoryRepository.findCategoryById(id);
@@ -66,6 +84,13 @@ public class CategoryService {
                 .build();
     }
 
+
+
+
+
+
+
+
     public StandardResponse<CategoryForFront> getById(UUID id){
         Category category = categoryRepository.findCategoryById(id);
         if (category==null){
@@ -79,8 +104,36 @@ public class CategoryService {
                 .build();
     }
 
+
+
+
+
+
+
     public Page<CategoryForFront> getAllCategories(int page, int size){
         Pageable pageable = PageRequest.of(page, size);
         return categoryRepository.findAllCategories(pageable);
+    }
+
+
+
+
+    public StandardResponse<CategoryForFront> update(UUID id, CategoryDto categoryDto, Principal principal){
+        Category category = categoryRepository.findCategoryById(id);
+        if (category==null){
+            throw new DataNotFoundException("Category not found!");
+        }
+        category.setDescription(categoryDto.getDescription());
+        category.setName(categoryDto.getName());
+        category.setUpdatedTime(LocalDateTime.now());
+        category.setUpdatedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
+        Category save = categoryRepository.save(category);
+        CategoryForFront categoryForFront = modelMapper.map(save, CategoryForFront.class);
+
+        return StandardResponse.<CategoryForFront>builder()
+                .data(categoryForFront)
+                .status(Status.SUCCESS)
+                .message("Category updated!")
+                .build();
     }
 }

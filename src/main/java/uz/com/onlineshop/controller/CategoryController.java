@@ -19,6 +19,9 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
+
+
+
     @PostMapping("/save")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
     public StandardResponse<CategoryForFront> save(
@@ -26,6 +29,11 @@ public class CategoryController {
             ){
         return categoryService.save(categoryDto);
     }
+
+
+
+
+
 
     @DeleteMapping("/{id}/delete-by-id")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
@@ -36,6 +44,11 @@ public class CategoryController {
         return categoryService.delete(id, principal);
     }
 
+
+
+
+
+
     @GetMapping("/get-by-id/{id}")
     public StandardResponse<CategoryForFront> getById(
             @PathVariable UUID id
@@ -43,9 +56,26 @@ public class CategoryController {
         return categoryService.getById(id);
     }
 
+
+
+
+
     @GetMapping("/get-all-categories")
     public Page<CategoryForFront> getCategories(@RequestParam(defaultValue = "0") int page,
                                            @RequestParam(defaultValue = "10") int size) {
         return categoryService.getAllCategories(page, size);
+    }
+
+
+
+
+    @PutMapping("/update-category/{id}")
+    @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
+    public StandardResponse<CategoryForFront> update(
+            @PathVariable UUID id,
+            @RequestBody CategoryDto categoryDto,
+            Principal principal
+    ){
+        return categoryService.update(id, categoryDto, principal);
     }
 }

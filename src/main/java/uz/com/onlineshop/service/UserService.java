@@ -38,6 +38,10 @@ public class UserService {
     private final JwtService jwtService;
     private final VerificationRepository verificationRepository;
 
+
+
+
+
     public StandardResponse<JwtResponse> signUp (UserDto userDto){
        checkUserEmailAndPhoneNumber(userDto.getEmail(), userDto.getPhoneNumber());
        UserEntity userEntity = modelMapper.map(userDto, UserEntity.class);
@@ -69,6 +73,11 @@ public class UserService {
                .build();
     }
 
+
+
+
+
+
     private void checkUserEmailAndPhoneNumber(String email, String phoneNumber) {
         UserEntity userEntity = userRepository.findUserEntityByEmail(email);
         if (userEntity!=null){
@@ -78,6 +87,14 @@ public class UserService {
            throw new DataNotFoundException("User has already exist");
        }
     }
+
+
+
+
+
+
+
+
 
     public StandardResponse<JwtResponse> signIn(LoginDto loginDto){
           UserEntity userEntity = userRepository.findUserEntityByEmail(loginDto.getEmail());
@@ -104,6 +121,12 @@ public class UserService {
         }
     }
 
+
+
+
+
+
+
     public StandardResponse<UserForFront> getById(UUID id){
         UserEntity userEntity = userRepository.findUserEntityById(id);
         if (userEntity==null){
@@ -116,6 +139,11 @@ public class UserService {
                 .message("This is user")
                 .build();
     }
+
+
+
+
+
 
     public StandardResponse<String> deleteUser(UUID id, Principal principal){
         UserEntity user = userRepository.findUserEntityByEmail(principal.getName());
@@ -135,6 +163,11 @@ public class UserService {
                 .build();
     }
 
+
+
+
+
+
     public StandardResponse<UserForFront> assignToAdmin(UUID id, Principal principal){
         UserEntity userEntity = userRepository.findUserEntityById(id);
         if (userEntity==null){
@@ -152,6 +185,12 @@ public class UserService {
                 .build();
     }
 
+
+
+
+
+
+
     public StandardResponse<String> forgotPassword(String code,String newPassword, Principal principal){
         UserEntity userEntity = userRepository.findUserEntityByEmail(principal.getName());
         VerificationEntity verification =  verificationRepository.findByUserEmailAndCode(userEntity.getId(),code);
@@ -168,6 +207,11 @@ public class UserService {
                 .message("Your password changed!")
                 .build();
     }
+
+
+
+
+
 
     public StandardResponse<UserForFront> updateProfile(UUID id, UserDto userDto,Principal principal){
         UserEntity userEntity = userRepository.findUserEntityById(id);
@@ -196,7 +240,11 @@ public class UserService {
                 .build();
     }
 
-    public Page<UserForFront> getAll(int page, int size){
+
+
+
+
+    public Page<UserEntity> getAll(int page, int size){
         Pageable pageable = PageRequest.of(page, size);
         return userRepository.findAllUsers(pageable);
     }

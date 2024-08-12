@@ -26,6 +26,10 @@ public class MailSendingService {
      private String sender;
     Random random = new Random();
 
+
+
+
+
      public StandardResponse<String> sendMessage(String email){
          int message = 100000 + random.nextInt(900000);
          UserEntity userEntity = userRepository.findUserEntityByEmail(email);

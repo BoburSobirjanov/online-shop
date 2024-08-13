@@ -91,6 +91,9 @@ public class ProductService {
         return productRepository.findAllProducts(pageable);
     }
 
+
+
+
     public List<ProductEntity> getByCategory(UUID id){
         List<ProductEntity> productEntities = productRepository.findProductEntityByCategoryId(id);
         if (productEntities==null){

@@ -39,8 +39,7 @@ public class MailSendingService {
          SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
          simpleMailMessage.setFrom("sobirjanovobubr768@gmail.com");
          simpleMailMessage.setTo(email);
-         simpleMailMessage.setText("Your verification code: " + message);
-         System.out.println("verification code: "+message);
+         simpleMailMessage.setText("Do not give to others this code. Your verification code: " + message);
          VerificationEntity verificationEntity = verificationRepository.findVerificationEntityByUserId(userEntity.getId());
          if (verificationEntity==null){
              VerificationEntity verification = new VerificationEntity();

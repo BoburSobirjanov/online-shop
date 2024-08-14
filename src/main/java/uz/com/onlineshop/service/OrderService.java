@@ -2,6 +2,8 @@ package uz.com.onlineshop.service;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.com.onlineshop.exception.DataNotFoundException;
 import uz.com.onlineshop.model.dto.request.OrderDto;
@@ -123,5 +125,23 @@ public class OrderService {
                 .status(Status.SUCCESS)
                 .message("Order updated!")
                 .build();
+    }
+
+
+
+    public Page<OrderForFront> getCancelledOrders(Pageable pageable){
+        Page<OrderEntity> orderEntities = orderRepository.findOrderEntityByOrderStatus(pageable);
+       return  orderEntities.map(order -> new OrderForFront(order.getId(),order.getTotalAmount(),
+               order.getPaymentMethod(),order.getOrderStatus(),
+               order.getShippingAddress(), order.getBillingAddress()));
+    }
+
+
+
+    public Page<OrderForFront> getMyOrders(Pageable pageable, Principal principal){
+        Page<OrderEntity> orderEntities = orderRepository.findOrderEntityByUserId(pageable,userRepository.findUserEntityByEmail(principal.getName()));
+        return orderEntities.map(order -> new OrderForFront(order.getId(),order.getTotalAmount(),
+                order.getPaymentMethod(),order.getOrderStatus(),
+                order.getShippingAddress(), order.getBillingAddress()));
     }
 }

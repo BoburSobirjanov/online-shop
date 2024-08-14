@@ -46,5 +46,4 @@ public class ProductForFront {
 
     private String countryOfOrigin;
 
-    private String imagePath;
 }

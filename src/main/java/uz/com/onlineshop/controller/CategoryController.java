@@ -2,6 +2,8 @@ package uz.com.onlineshop.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.com.onlineshop.model.dto.request.CategoryDto;
@@ -63,7 +65,8 @@ public class CategoryController {
     @GetMapping("/get-all-categories")
     public Page<CategoryForFront> getCategories(@RequestParam(defaultValue = "0") int page,
                                            @RequestParam(defaultValue = "10") int size) {
-        return categoryService.getAllCategories(page, size);
+        Pageable pageable = PageRequest.of(page, size);
+        return categoryService.getAllCategories(pageable);
     }
 
 

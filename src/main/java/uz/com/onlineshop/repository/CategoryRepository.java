@@ -16,5 +16,5 @@ public interface CategoryRepository extends JpaRepository<Category,UUID> {
     @Query("select u from categories as u where u.isDeleted=false and u.id=?1")
     Category findCategoryById(UUID id);
     @Query("select u from categories as u where u.isDeleted=false")
-    Page<CategoryForFront> findAllCategories(Pageable pageable);
+    Page<Category> findAllCategories(Pageable pageable);
 }

@@ -110,9 +110,9 @@ public class CategoryService {
 
 
 
-    public Page<CategoryForFront> getAllCategories(int page, int size){
-        Pageable pageable = PageRequest.of(page, size);
-        return categoryRepository.findAllCategories(pageable);
+    public Page<CategoryForFront> getAllCategories(Pageable pageable){
+        Page<Category> categories = categoryRepository.findAllCategories(pageable);
+        return categories.map(category -> new CategoryForFront(category.getId(), category.getName(), category.getDescription()));
     }
 
 

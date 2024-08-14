@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -86,9 +85,17 @@ public class ProductService {
 
 
 
-    public Page<ProductEntity> getAll(int page, int size){
-        Pageable pageable = PageRequest.of(page, size);
-        return productRepository.findAllProducts(pageable);
+    public Page<ProductForFront> getAll(Pageable pageable){
+        Page<ProductEntity> productEntities = productRepository.findAllProducts(pageable);
+        return productEntities.map(product -> new ProductForFront(product.getId(), product.getName(),
+                product.getDescription(), product.getPrice(),
+                product.getStock(), product.getBrand(),
+                product.getModel(), product.getCategoryId(),
+                product.getWeight(), product.getDimensions(),
+                product.getColor(), product.getMaterial(),
+                product.getWarranty(), product.getSku(),
+                product.getBarcode(), product.getManufacturer(),
+                product.getCountryOfOrigin()));
     }
 
 

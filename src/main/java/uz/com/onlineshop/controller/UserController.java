@@ -2,6 +2,8 @@ package uz.com.onlineshop.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.com.onlineshop.model.dto.request.user.UserDto;
@@ -87,8 +89,9 @@ public class UserController {
 
     @GetMapping("/get-all-users")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
-    public Page<UserEntity> getUsers(@RequestParam(defaultValue = "0") int page,
+    public Page<UserForFront> getUsers(@RequestParam(defaultValue = "0") int page,
                                      @RequestParam(defaultValue = "10") int size) {
-        return userService.getAll(page, size);
+        Pageable pageable = PageRequest.of(page, size);
+        return userService.getAll(pageable);
     }
 }

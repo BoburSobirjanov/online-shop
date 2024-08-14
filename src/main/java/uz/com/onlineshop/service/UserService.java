@@ -3,7 +3,6 @@ package uz.com.onlineshop.service;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -244,8 +243,9 @@ public class UserService {
 
 
 
-    public Page<UserEntity> getAll(int page, int size){
-        Pageable pageable = PageRequest.of(page, size);
-        return userRepository.findAllUsers(pageable);
+    public Page<UserForFront> getAll(Pageable pageable){
+        Page<UserEntity> users = userRepository.findAllUsers(pageable);
+        return users.map(user -> new UserForFront(user.getId(), user.getFullName(), user.getPhoneNumber(), user.getUsername(),
+                user.getEmail(), user.getAddress(), user.getRole(),user.getGender()));
     }
 }

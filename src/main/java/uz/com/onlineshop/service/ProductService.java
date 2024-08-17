@@ -1,5 +1,6 @@
 package uz.com.onlineshop.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import uz.com.onlineshop.exception.DataNotFoundException;
+import uz.com.onlineshop.filter.IpAddressUtil;
 import uz.com.onlineshop.model.dto.request.ProductDto;
 import uz.com.onlineshop.model.dto.response.ProductForFront;
 import uz.com.onlineshop.model.entity.product.ProductEntity;
@@ -19,7 +21,9 @@ import uz.com.onlineshop.response.Status;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -31,6 +35,37 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
+    private final Map<String, Long> ipProductViewMap = new HashMap<>();
+
+
+
+
+    public void trackView(UUID productId, HttpServletRequest request) {
+        String clientIp = IpAddressUtil.getClientIp(request);
+        String key = clientIp + "_" + productId.toString();
+
+        Long currentTime = System.currentTimeMillis();
+        Long lastViewed = ipProductViewMap.get(key);
+
+        if (lastViewed == null || (currentTime - lastViewed) > 3600000) {
+            ipProductViewMap.put(key, currentTime);
+            incrementViewCount(productId);
+        }
+    }
+
+
+
+
+
+    public void incrementViewCount(UUID productId) {
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new DataNotFoundException("Product not found with id " + productId));
+
+        product.setViewCount(product.getViewCount() + 1);
+        productRepository.save(product);
+    }
+
+
 
 
 
@@ -52,6 +87,7 @@ public class ProductService {
         productEntity.setStock(productDto.getStock());
         productEntity.setWarranty(productDto.getWarranty());
         productEntity.setWeight(productDto.getWeight());
+        productEntity.setViewCount(0);
         ProductEntity save = productRepository.save(productEntity);
         ProductForFront productForFront = modelMapper.map(save, ProductForFront.class);
         return StandardResponse.<ProductForFront>builder()

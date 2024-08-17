@@ -1,5 +1,6 @@
 package uz.com.onlineshop.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -76,8 +77,10 @@ public class ProductController {
 
     @GetMapping("/{id}/get-by-id")
     public StandardResponse<ProductForFront> getById(
-            @PathVariable UUID id
+            @PathVariable UUID id,
+            HttpServletRequest request
     ){
+        productService.trackView(id, request);
         return productService.getById(id);
     }
 

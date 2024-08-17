@@ -64,4 +64,6 @@ public class ProductEntity extends BaseEntity {
     @Column(nullable = false)
     private String countryOfOrigin;
 
+    private Integer viewCount = 0;
+
 }

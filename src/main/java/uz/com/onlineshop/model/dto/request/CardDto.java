@@ -14,4 +14,6 @@ public class CardDto {
     private String cardType;
 
     private Double cardBalance;
+
+    private String expireDate;
 }

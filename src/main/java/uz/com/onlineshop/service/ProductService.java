@@ -9,11 +9,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import uz.com.onlineshop.exception.DataNotFoundException;
+import uz.com.onlineshop.exception.NotAcceptableException;
 import uz.com.onlineshop.filter.IpAddressUtil;
 import uz.com.onlineshop.model.dto.request.ProductDto;
 import uz.com.onlineshop.model.dto.response.ProductForFront;
 import uz.com.onlineshop.model.entity.product.ProductEntity;
 import uz.com.onlineshop.model.entity.user.UserEntity;
+import uz.com.onlineshop.repository.CategoryRepository;
 import uz.com.onlineshop.repository.ProductRepository;
 import uz.com.onlineshop.repository.UserRepository;
 import uz.com.onlineshop.response.StandardResponse;
@@ -35,7 +37,10 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
     private final Map<String, Long> ipProductViewMap = new HashMap<>();
+
+
 
 
 
@@ -43,10 +48,8 @@ public class ProductService {
     public void trackView(UUID productId, HttpServletRequest request) {
         String clientIp = IpAddressUtil.getClientIp(request);
         String key = clientIp + "_" + productId.toString();
-
         Long currentTime = System.currentTimeMillis();
         Long lastViewed = ipProductViewMap.get(key);
-
         if (lastViewed == null || (currentTime - lastViewed) > 3600000) {
             ipProductViewMap.put(key, currentTime);
             incrementViewCount(productId);
@@ -81,6 +84,9 @@ public class ProductService {
         productEntity.setPrice(productDto.getPrice());
         productEntity.setDimensions(productDto.getDimensions());
         productEntity.setMaterial(productDto.getMaterial());
+        if (categoryRepository.findCategoryById(UUID.fromString(productDto.getCategoryId()))==null){
+            throw new NotAcceptableException("Category not found! Try again!");
+        }
         productEntity.setCategoryId(UUID.fromString(productDto.getCategoryId()));
         productEntity.setCountryOfOrigin(productDto.getCountryOfOrigin());
         productEntity.setManufacturer(productDto.getManufacturer());
@@ -121,7 +127,8 @@ public class ProductService {
 
 
 
-    public Page<ProductForFront> getAll(Pageable pageable){
+
+    public Page<ProductForFront> getAllProducts(Pageable pageable){
         Page<ProductEntity> productEntities = productRepository.findAllProducts(pageable);
         return productEntities.map(product -> new ProductForFront(product.getId(), product.getName(),
                 product.getDescription(), product.getPrice(),
@@ -133,6 +140,72 @@ public class ProductService {
                 product.getBarcode(), product.getManufacturer(),
                 product.getCountryOfOrigin()));
     }
+
+
+
+
+
+
+
+
+    public Page<ProductForFront> getAllByView(Pageable pageable){
+        Page<ProductEntity> productEntities = productRepository.findAllByViewCount(pageable);
+        return productEntities.map(product -> new ProductForFront(product.getId(), product.getName(),
+                product.getDescription(), product.getPrice(),
+                product.getStock(), product.getBrand(),
+                product.getModel(), product.getCategoryId(),
+                product.getWeight(), product.getDimensions(),
+                product.getColor(), product.getMaterial(),
+                product.getWarranty(), product.getSku(),
+                product.getBarcode(), product.getManufacturer(),
+                product.getCountryOfOrigin()));
+    }
+
+
+
+
+
+
+
+
+
+    public Page<ProductForFront> getAllByPriceAsc(Pageable pageable){
+        Page<ProductEntity> productEntities = productRepository.findAllProductsByPriceAsc(pageable);
+        return productEntities.map(product -> new ProductForFront(product.getId(), product.getName(),
+                product.getDescription(), product.getPrice(),
+                product.getStock(), product.getBrand(),
+                product.getModel(), product.getCategoryId(),
+                product.getWeight(), product.getDimensions(),
+                product.getColor(), product.getMaterial(),
+                product.getWarranty(), product.getSku(),
+                product.getBarcode(), product.getManufacturer(),
+                product.getCountryOfOrigin()));
+    }
+
+
+
+
+
+
+
+
+    public Page<ProductForFront> getAllByPriceDesc(Pageable pageable){
+        Page<ProductEntity> productEntities = productRepository.findAllByPriceDesc(pageable);
+        return productEntities.map(product -> new ProductForFront(product.getId(), product.getName(),
+                product.getDescription(), product.getPrice(),
+                product.getStock(), product.getBrand(),
+                product.getModel(), product.getCategoryId(),
+                product.getWeight(), product.getDimensions(),
+                product.getColor(), product.getMaterial(),
+                product.getWarranty(), product.getSku(),
+                product.getBarcode(), product.getManufacturer(),
+                product.getCountryOfOrigin()));
+    }
+
+
+
+
+
 
 
 

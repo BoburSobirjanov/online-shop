@@ -3,7 +3,6 @@ package uz.com.onlineshop.service;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.com.onlineshop.exception.DataNotFoundException;
@@ -11,13 +10,16 @@ import uz.com.onlineshop.exception.NotAcceptableException;
 import uz.com.onlineshop.model.dto.request.CategoryDto;
 import uz.com.onlineshop.model.dto.response.CategoryForFront;
 import uz.com.onlineshop.model.entity.categories.Category;
+import uz.com.onlineshop.model.entity.product.ProductEntity;
 import uz.com.onlineshop.repository.CategoryRepository;
+import uz.com.onlineshop.repository.ProductRepository;
 import uz.com.onlineshop.repository.UserRepository;
 import uz.com.onlineshop.response.StandardResponse;
 import uz.com.onlineshop.response.Status;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,6 +29,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
+    private final ProductRepository productRepository;
 
 
 
@@ -71,6 +74,12 @@ public class CategoryService {
         Category category = categoryRepository.findCategoryById(id);
         if (category==null){
             throw new DataNotFoundException("Category not found!");
+        }
+        List<ProductEntity> productEntityList = productRepository.findProductEntityByCategoryId(id);
+        for (ProductEntity product:productEntityList) {
+            if(product.getCategoryId().equals(category.getId())){
+                throw new NotAcceptableException("Can not delete this category. Because it has product.");
+            }
         }
         category.setDeleted(true);
         category.setDeletedTime(LocalDateTime.now());

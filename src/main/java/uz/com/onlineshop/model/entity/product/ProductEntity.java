@@ -2,10 +2,10 @@ package uz.com.onlineshop.model.entity.product;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
+
 import lombok.*;
 import uz.com.onlineshop.model.entity.BaseEntity;
-import uz.com.onlineshop.model.entity.categories.Category;
+
 
 import java.util.UUID;
 
@@ -65,5 +65,8 @@ public class ProductEntity extends BaseEntity {
     private String countryOfOrigin;
 
     private Integer viewCount = 0;
+
+    @Column(columnDefinition = "integer default 0")
+    private Integer isSale;
 
 }

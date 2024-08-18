@@ -12,11 +12,20 @@ import java.util.UUID;
 
 @Repository
 public interface OrderRepository extends JpaRepository<OrderEntity,UUID> {
+
+
     @Query("select u from orders as u where u.isDeleted=false and u.id=?1")
     OrderEntity findOrderEntityById(UUID id);
 
+
+
+
     @Query("select u from orders as u where u.isDeleted=false and  u.orderStatus='CANCELLED'")
     Page<OrderEntity> findOrderEntityByOrderStatus(Pageable pageable);
+
+
+
+
     @Query("select u from orders as u where u.isDeleted=false and u.userId=?1")
     Page<OrderEntity> findOrderEntityByUserId(Pageable pageable, UserEntity user);
 }

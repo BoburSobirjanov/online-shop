@@ -52,14 +52,62 @@ public class ProductController {
 
 
 
+
+
     @GetMapping("/get-all-products")
-    public Page<ProductForFront> getAll(
-       @RequestParam(defaultValue = "0") int page,
-       @RequestParam(defaultValue = "10") int size
+    public Page<ProductForFront> findAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
     ){
         Pageable pageable = PageRequest.of(page, size);
-        return productService.getAll(pageable);
+        return productService.getAllProducts(pageable);
     }
+
+
+
+
+
+
+
+    @GetMapping("/get-all-products-popular")
+    public Page<ProductForFront> findAllByViews(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        Pageable pageable = PageRequest.of(page, size);
+        return productService.getAllByView(pageable);
+    }
+
+
+
+
+
+    @GetMapping("/get-all-products-asc")
+    public Page<ProductForFront> findAllByPriceAsc(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        Pageable pageable = PageRequest.of(page, size);
+        return productService.getAllByPriceAsc(pageable);
+    }
+
+
+
+
+
+
+
+    @GetMapping("/get-all-products-desc")
+    public Page<ProductForFront> findAllByPriceDesc(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        Pageable pageable = PageRequest.of(page, size);
+        return productService.getAllByPriceDesc(pageable);
+    }
+
+
+
 
 
 

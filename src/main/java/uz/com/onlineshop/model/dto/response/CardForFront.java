@@ -1,6 +1,7 @@
 package uz.com.onlineshop.model.dto.response;
 
 import lombok.*;
+import uz.com.onlineshop.model.entity.card.CardType;
 
 import java.util.UUID;
 
@@ -15,5 +16,7 @@ public class CardForFront {
 
     private String cardNumber;
 
-    private String cardType;
+    private CardType cardType;
+
+    private String expireDate;
 }

@@ -23,6 +23,11 @@ public class CardEntity extends BaseEntity {
     private CardType cardType;
 
 
+    @Column(nullable = false)
+    private String expireDate;
+
+
+    @Column(nullable = false)
     private Double cardBalance;
 
     @ManyToOne

@@ -7,7 +7,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import uz.com.onlineshop.exception.NotAcceptableException;
 import uz.com.onlineshop.model.entity.user.UserEntity;
-import uz.com.onlineshop.model.entity.user.VerificationEntity;
+import uz.com.onlineshop.model.entity.verification.VerificationEntity;
 import uz.com.onlineshop.repository.UserRepository;
 import uz.com.onlineshop.repository.VerificationRepository;
 import uz.com.onlineshop.response.StandardResponse;

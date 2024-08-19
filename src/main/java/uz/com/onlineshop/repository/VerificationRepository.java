@@ -3,7 +3,7 @@ package uz.com.onlineshop.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import uz.com.onlineshop.model.entity.user.VerificationEntity;
+import uz.com.onlineshop.model.entity.verification.VerificationEntity;
 
 import java.util.UUID;
 

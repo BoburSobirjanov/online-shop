@@ -31,4 +31,8 @@ public interface UserRepository extends JpaRepository<UserEntity,UUID> {
 
     @Query("select u from users as u where u.isDeleted=false")
     Page<UserEntity> findAllUsers(Pageable pageable);
+
+
+    @Query("select u from users as u where u.isDeleted=false and u.userStatus=?1")
+    Page<UserEntity> findUserEntityByUserStatus(Pageable pageable, String status);
 }

@@ -1,6 +1,7 @@
 package uz.com.onlineshop.model.entity.card;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import uz.com.onlineshop.model.entity.BaseEntity;
 import uz.com.onlineshop.model.entity.user.UserEntity;
@@ -15,7 +16,8 @@ import uz.com.onlineshop.model.entity.user.UserEntity;
 public class CardEntity extends BaseEntity {
 
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 16)
+    @Size(max = 16, message = "Field value cannot exceed 16 characters")
     private String cardNumber;
 
 

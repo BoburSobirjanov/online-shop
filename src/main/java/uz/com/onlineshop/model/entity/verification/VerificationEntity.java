@@ -1,4 +1,4 @@
-package uz.com.onlineshop.model.entity.user;
+package uz.com.onlineshop.model.entity.verification;
 
 import jakarta.persistence.*;
 import lombok.*;

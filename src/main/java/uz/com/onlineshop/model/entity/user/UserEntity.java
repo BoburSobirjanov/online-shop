@@ -50,6 +50,13 @@ public class UserEntity extends BaseEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    @Enumerated(EnumType.STRING)
+    private UserStatus userStatus;
+
+    private UUID blockedBy;
+
+    private UUID activeBy;
+
     private UUID changeRoleBy;
 
     @Override

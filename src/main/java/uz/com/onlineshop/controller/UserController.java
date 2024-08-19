@@ -8,7 +8,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.com.onlineshop.model.dto.request.user.UserDto;
 import uz.com.onlineshop.model.dto.response.UserForFront;
-import uz.com.onlineshop.model.entity.user.UserEntity;
 import uz.com.onlineshop.response.StandardResponse;
 import uz.com.onlineshop.service.UserService;
 
@@ -93,5 +92,47 @@ public class UserController {
                                      @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return userService.getAll(pageable);
+    }
+
+
+
+
+
+
+    @PutMapping("/{id}/user-blocked")
+    @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
+    public StandardResponse<String> userBlocked(
+            @PathVariable UUID id,
+            Principal principal
+    ){
+        return userService.userBlocked(id, principal);
+    }
+
+
+
+
+
+
+    @PutMapping("/{id}/user-activated")
+    @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
+    public StandardResponse<String> userActivated(
+            @PathVariable UUID id,
+            Principal principal
+    ){
+        return userService.userActivated(id, principal);
+    }
+
+
+
+
+    @PutMapping("/get-all-user-by-status")
+    @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
+    public Page<UserForFront> getUsersByStatus(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam String status
+    ){
+        Pageable pageable = PageRequest.of(page,size);
+        return userService.getUserByStatus(pageable,status);
     }
 }

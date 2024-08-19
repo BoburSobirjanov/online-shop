@@ -15,7 +15,8 @@ import uz.com.onlineshop.model.dto.response.UserForFront;
 import uz.com.onlineshop.model.entity.user.Gender;
 import uz.com.onlineshop.model.entity.user.UserEntity;
 import uz.com.onlineshop.model.entity.user.UserRole;
-import uz.com.onlineshop.model.entity.user.VerificationEntity;
+import uz.com.onlineshop.model.entity.user.UserStatus;
+import uz.com.onlineshop.model.entity.verification.VerificationEntity;
 import uz.com.onlineshop.repository.UserRepository;
 import uz.com.onlineshop.repository.VerificationRepository;
 import uz.com.onlineshop.response.JwtResponse;
@@ -55,6 +56,7 @@ public class UserService {
        userEntity.setFullName(userDto.getFullName());
        userEntity.setUsername(userDto.getUsername());
        userEntity.setEmail(userDto.getEmail());
+       userEntity.setUserStatus(UserStatus.ACTIVE);
        userEntity.setPhoneNumber(userDto.getPhoneNumber());
        userRepository.save(userEntity);
        String accessToken = jwtService.generateAccessToken(userEntity);
@@ -97,7 +99,7 @@ public class UserService {
 
     public StandardResponse<JwtResponse> signIn(LoginDto loginDto){
           UserEntity userEntity = userRepository.findUserEntityByEmail(loginDto.getEmail());
-          if (userEntity==null){
+          if (userEntity==null || userEntity.getUserStatus()==UserStatus.BLOCKED){
               throw new DataNotFoundException("User not found!");
           }
         if (passwordEncoder.matches(loginDto.getPassword(), userEntity.getPassword())){
@@ -246,6 +248,57 @@ public class UserService {
     public Page<UserForFront> getAll(Pageable pageable){
         Page<UserEntity> users = userRepository.findAllUsers(pageable);
         return users.map(user -> new UserForFront(user.getId(), user.getFullName(), user.getPhoneNumber(), user.getUsername(),
+                user.getEmail(), user.getAddress(), user.getRole(),user.getGender()));
+    }
+
+
+
+
+
+    public StandardResponse<String> userBlocked(UUID id, Principal principal){
+        UserEntity userEntity = userRepository.findUserEntityById(id);
+        if (userEntity==null || userEntity.getUserStatus()==UserStatus.BLOCKED){
+            throw new DataNotFoundException("User not found or this user has already blocked");
+        }
+        userEntity.setUserStatus(UserStatus.BLOCKED);
+        userEntity.setBlockedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
+        userRepository.save(userEntity);
+
+        return StandardResponse.<String>builder()
+                .data("BLOCKED")
+                .status(Status.SUCCESS)
+                .message("User blocked")
+                .build();
+    }
+
+
+
+
+
+
+    public StandardResponse<String> userActivated(UUID id, Principal principal){
+        UserEntity userEntity = userRepository.findUserEntityById(id);
+        if (userEntity==null || userEntity.getUserStatus()==UserStatus.ACTIVE){
+            throw new DataNotFoundException("User not found or this user has already activated!");
+        }
+        userEntity.setUserStatus(UserStatus.ACTIVE);
+        userEntity.setActiveBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
+        userRepository.save(userEntity);
+
+        return StandardResponse.<String>builder()
+                .data("ACTIVATED")
+                .status(Status.SUCCESS)
+                .message("User blocked")
+                .build();
+    }
+
+
+
+
+
+    public Page<UserForFront> getUserByStatus(Pageable pageable, String status){
+        Page<UserEntity> userEntities = userRepository.findUserEntityByUserStatus(pageable, status);
+        return userEntities.map(user -> new UserForFront(user.getId(), user.getFullName(), user.getPhoneNumber(), user.getUsername(),
                 user.getEmail(), user.getAddress(), user.getRole(),user.getGender()));
     }
 }

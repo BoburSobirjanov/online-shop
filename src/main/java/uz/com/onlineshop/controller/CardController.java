@@ -1,5 +1,6 @@
 package uz.com.onlineshop.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,7 +28,7 @@ public class CardController {
 
     @PostMapping("/save-card")
     public StandardResponse<CardForFront> save(
-            @RequestBody CardDto cardDto,
+            @Valid @RequestBody CardDto cardDto,
             Principal principal
             ){
         return cardService.save(cardDto, principal);

@@ -33,8 +33,14 @@ public class CardService {
     public StandardResponse<CardForFront> save(CardDto cardDto, Principal principal){
         checkHasCard(cardDto.getCardNumber());
         CardEntity card = modelMapper.map(cardDto, CardEntity.class);
+        if (cardDto.getCardNumber()!=null && cardDto.getCardNumber().length()>16){
+            throw new NotAcceptableException("Field value cannot exceed 16 characters!");
+        }
         card.setCardNumber(cardDto.getCardNumber());
         card.setExpireDate(cardDto.getExpireDate());
+        if (cardDto.getCardBalance()<0){
+            throw new NotAcceptableException("Balance can not be less than 0");
+        }
         card.setCardBalance(cardDto.getCardBalance());
         try {
             card.setCardType(CardType.valueOf(cardDto.getCardType()));
@@ -140,6 +146,7 @@ public class CardService {
             throw new DataNotFoundException("Card not found!");
         }
         card.setCardBalance(card.getCardBalance()+balance);
+        cardRepository.save(card);
         return StandardResponse.<String>builder()
                 .data("FILLED BALANCE")
                 .status(Status.SUCCESS)

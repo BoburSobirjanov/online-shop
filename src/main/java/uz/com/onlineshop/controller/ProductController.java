@@ -7,12 +7,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import uz.com.onlineshop.model.dto.request.ProductDto;
 import uz.com.onlineshop.model.dto.response.ProductForFront;
 import uz.com.onlineshop.model.entity.product.ProductEntity;
 import uz.com.onlineshop.response.StandardResponse;
 import uz.com.onlineshop.service.ProductService;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +33,7 @@ public class ProductController {
     @PreAuthorize("hasRole('ADMIN')")
     public StandardResponse<ProductForFront> save(
             @RequestBody ProductDto productDto
-            ){
+        ){
         return productService.save(productDto);
     }
 

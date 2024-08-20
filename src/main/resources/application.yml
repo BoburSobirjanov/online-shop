@@ -20,7 +20,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: sobirjanovbobur768@gmail.com
-    password: tljdhmzkabfduowg
+    password: tjqmurlnokjkxkch
     properties:
       mjaail:
         smtp:
@@ -36,12 +36,3 @@ jwt:
     expiry: 86400000
   refresh:
     expiry: 604800000
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "health, beans, metrics"
-      base-path: "/management-dashboard"
-  endpoint:
-    health:
-      show-details: always

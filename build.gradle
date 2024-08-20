@@ -29,7 +29,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '3.3.2'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
     implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.1.1'
     implementation 'javax.xml.bind:jaxb-api:2.3.1'

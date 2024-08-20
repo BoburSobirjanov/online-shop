@@ -37,7 +37,7 @@ public class MailSendingService {
              throw new NotAcceptableException("Wrong! Did not sign up use this email!");
          }
          SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-         simpleMailMessage.setFrom("sobirjanovobubr768@gmail.com");
+         simpleMailMessage.setFrom(sender);
          simpleMailMessage.setTo(email);
          simpleMailMessage.setText("Do not give to others this code. Your verification code: " + message);
          VerificationEntity verificationEntity = verificationRepository.findVerificationEntityByUserId(userEntity.getId());

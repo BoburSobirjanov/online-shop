@@ -200,6 +200,7 @@ public class UserService {
         }
         UserEntity user = userRepository.findUserEntityByEmail(principal.getName());
         user.setPassword(passwordEncoder.encode(newPassword));
+        verificationRepository.delete(verification);
         userRepository.save(user);
 
         return StandardResponse.<String>builder()

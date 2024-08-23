@@ -2,7 +2,6 @@ package uz.com.onlineshop.model.dto.response;
 
 
 import lombok.*;
-import uz.com.onlineshop.model.entity.product.ProductEntity;
 
 import java.util.List;
 
@@ -11,9 +10,9 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class OrderItemDto {
+public class OrderItemForFront {
 
-    private List<ProductEntity> productId;
+    private List<ProductForFront> productId;
 
     private Integer quantity;
 

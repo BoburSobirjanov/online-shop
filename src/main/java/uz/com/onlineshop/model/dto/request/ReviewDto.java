@@ -9,8 +9,6 @@ import lombok.*;
 @Builder
 public class ReviewDto {
 
-    private String userId;
-
     private String productId;
 
     private Integer rating;

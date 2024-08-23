@@ -7,8 +7,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.com.onlineshop.model.dto.request.user.UserDto;
+import uz.com.onlineshop.model.dto.response.ReviewForFront;
 import uz.com.onlineshop.model.dto.response.UserForFront;
 import uz.com.onlineshop.response.StandardResponse;
+import uz.com.onlineshop.service.ReviewService;
 import uz.com.onlineshop.service.UserService;
 
 import java.security.Principal;
@@ -23,6 +25,11 @@ public class UserController {
 
 
     private final UserService userService;
+    private final ReviewService reviewService;
+
+
+
+
     @GetMapping("/get-user-by-id/{id}")
     public StandardResponse<UserForFront> getById(
             @PathVariable UUID id
@@ -134,5 +141,21 @@ public class UserController {
     ){
         Pageable pageable = PageRequest.of(page,size);
         return userService.getUserByStatus(pageable,status);
+    }
+
+
+
+
+
+
+    @GetMapping("/{id}/get-user-reviews")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
+    public Page<ReviewForFront> getUsersReviews(
+            @PathVariable UUID id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        Pageable pageable = PageRequest.of(page,size);
+        return reviewService.findReviewsByUserId(pageable, id);
     }
 }

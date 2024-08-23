@@ -12,6 +12,7 @@ import java.util.UUID;
 @Setter
 @Builder
 public class OrderForFront {
+
     private UUID id;
 
     private Double totalAmount;

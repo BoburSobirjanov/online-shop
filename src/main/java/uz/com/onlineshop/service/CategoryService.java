@@ -75,7 +75,7 @@ public class CategoryService {
         if (category==null){
             throw new DataNotFoundException("Category not found!");
         }
-        List<ProductEntity> productEntityList = productRepository.findProductEntityByCategoryId(id);
+        List<ProductEntity> productEntityList = productRepository.getProductEntityByCategoryId(id);
         for (ProductEntity product:productEntityList) {
             if(product.getCategoryId().equals(category.getId())){
                 throw new NotAcceptableException("Can not delete this category. Because it has product.");

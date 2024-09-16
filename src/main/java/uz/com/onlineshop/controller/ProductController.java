@@ -10,13 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uz.com.onlineshop.model.dto.request.ProductDto;
 import uz.com.onlineshop.model.dto.response.ProductForFront;
-import uz.com.onlineshop.model.entity.product.ProductEntity;
 import uz.com.onlineshop.response.StandardResponse;
 import uz.com.onlineshop.service.ProductService;
 
-import java.io.IOException;
 import java.security.Principal;
-import java.util.List;
 import java.util.UUID;
 
 
@@ -32,9 +29,10 @@ public class ProductController {
     @PostMapping("/save")
     @PreAuthorize("hasRole('ADMIN')")
     public StandardResponse<ProductForFront> save(
-            @RequestBody ProductDto productDto
+            @ModelAttribute ProductDto productDto,
+            @RequestParam  MultipartFile productImage
         ){
-        return productService.save(productDto);
+        return productService.save(productImage,productDto);
     }
 
 
@@ -116,11 +114,17 @@ public class ProductController {
 
 
     @GetMapping("/get-by-category")
-    public List<ProductEntity> getByCategory(
-            @RequestParam UUID id
+    public Page<ProductForFront> getByCategory(
+            @RequestParam UUID id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
     ){
-        return productService.getByCategory(id);
+        Pageable pageable = PageRequest.of(page,size);
+        return productService.getByCategory(pageable,id);
     }
+
+
+
 
 
 
@@ -137,6 +141,9 @@ public class ProductController {
 
 
 
+
+
+
     @PutMapping("/update-product/{id}")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
     public StandardResponse<ProductForFront> update(
@@ -145,5 +152,32 @@ public class ProductController {
             Principal principal
     ){
         return productService.update(id, productDto, principal);
+    }
+
+
+
+
+
+
+    @GetMapping("/get-products-in-sale")
+    public Page<ProductForFront> getAllProductsInSale(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        Pageable pageable = PageRequest.of(page, size);
+        return productService.getProductsInSale(pageable);
+    }
+
+
+
+
+    @PutMapping("/{id}/set-sale")
+    @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
+    public StandardResponse<ProductForFront> setSaleToProduct(
+            @PathVariable UUID id,
+            @RequestParam Integer sale,
+            Principal principal
+    ){
+        return productService.setSaleToProduct(id, sale, principal);
     }
 }

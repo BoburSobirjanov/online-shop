@@ -195,8 +195,9 @@ public class UserService {
     public StandardResponse<String> forgotPassword(String code,String newPassword, Principal principal){
         UserEntity userEntity = userRepository.findUserEntityByEmail(principal.getName());
         VerificationEntity verification =  verificationRepository.findByUserEmailAndCode(userEntity.getId(),code);
-        if (!verification.getCode().equals(code)){
-            throw new NotAcceptableException("Verification code is incorrect!");
+        if (!verification.getCode().equals(code) ||
+                verification.getCreatedTime().plusMinutes(5).isBefore(LocalDateTime.now())){
+            throw new NotAcceptableException("Verification code is incorrect or expired!");
         }
         UserEntity user = userRepository.findUserEntityByEmail(principal.getName());
         user.setPassword(passwordEncoder.encode(newPassword));

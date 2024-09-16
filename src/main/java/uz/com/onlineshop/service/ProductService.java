@@ -8,8 +8,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import org.springframework.web.multipart.MultipartFile;
 import uz.com.onlineshop.exception.DataNotFoundException;
 import uz.com.onlineshop.exception.NotAcceptableException;
+import uz.com.onlineshop.filter.ImageUtils;
 import uz.com.onlineshop.filter.IpAddressUtil;
 import uz.com.onlineshop.model.dto.request.ProductDto;
 import uz.com.onlineshop.model.dto.response.ProductForFront;
@@ -35,6 +37,7 @@ public class ProductService {
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final ImageUtils imageUtils;
     private final Map<String, Long> ipProductViewMap = new HashMap<>();
 
 
@@ -69,40 +72,53 @@ public class ProductService {
 
 
 
-    public StandardResponse<ProductForFront> save(ProductDto productDto) {
-        ProductEntity productEntity = modelMapper.map(productDto, ProductEntity.class);
-        productEntity.setDescription(productDto.getDescription());
-        productEntity.setBrand(productDto.getBrand());
-        productEntity.setColor(productDto.getColor());
-        productEntity.setName(productDto.getName());
-        productEntity.setBarcode(productDto.getBarcode());
-        productEntity.setModel(productDto.getModel());
-        productEntity.setSku(productDto.getSku());
-        productEntity.setPrice(productDto.getPrice());
-        productEntity.setDimensions(productDto.getDimensions());
-        productEntity.setMaterial(productDto.getMaterial());
-        if (categoryRepository.findCategoryById(UUID.fromString(productDto.getCategoryId()))==null){
-            throw new NotAcceptableException("Category not found! Try again!");
+    public StandardResponse<ProductForFront> save(MultipartFile imageProduct, ProductDto productDto) {
+        ProductEntity product = modelMapper.map(productDto, ProductEntity.class);
+        try {
+
+            if (imageProduct == null) {
+                product.setProductImage(null);
+            } else {
+                if (imageUtils.uploadImage(imageProduct)) {
+                    System.out.println("Upload successfully");
+                }
+                product.setProductImage(Base64.getEncoder().encodeToString(imageProduct.getBytes()));
+            }
+            product.setDescription(productDto.getDescription());
+            product.setBrand(productDto.getBrand());
+            product.setColor(productDto.getColor());
+            product.setName(productDto.getName());
+            product.setBarcode(productDto.getBarcode());
+            product.setModel(productDto.getModel());
+            product.setSku(productDto.getSku());
+            product.setPrice(Double.valueOf(productDto.getPrice()));
+            product.setDimensions(productDto.getDimensions());
+            product.setMaterial(productDto.getMaterial());
+            if (categoryRepository.findCategoryById(UUID.fromString(productDto.getCategoryId())) == null) {
+                throw new NotAcceptableException("Category not found! Try again!");
+            }
+            product.setCategoryId(UUID.fromString(productDto.getCategoryId()));
+            product.setCountryOfOrigin(productDto.getCountryOfOrigin());
+            product.setManufacturer(productDto.getManufacturer());
+            product.setStock(Integer.valueOf(productDto.getStock()));
+            product.setWarranty(productDto.getWarranty());
+            product.setWeight(Double.valueOf(productDto.getWeight()));
+            product.setIsSale(Integer.valueOf(productDto.getSale()));
+            product.setViewCount(0);
+            ProductEntity save = productRepository.save(product);
+            ProductForFront productForFront = modelMapper.map(save, ProductForFront.class);
+            return StandardResponse.<ProductForFront>builder()
+                    .data(productForFront)
+                    .status(Status.SUCCESS)
+                    .message("Product added!")
+                    .build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-        productEntity.setCategoryId(UUID.fromString(productDto.getCategoryId()));
-        productEntity.setCountryOfOrigin(productDto.getCountryOfOrigin());
-        productEntity.setManufacturer(productDto.getManufacturer());
-        productEntity.setStock(productDto.getStock());
-        productEntity.setWarranty(productDto.getWarranty());
-        productEntity.setWeight(productDto.getWeight());
-        productEntity.setViewCount(0);
-        ProductEntity save = productRepository.save(productEntity);
-        ProductForFront productForFront = modelMapper.map(save, ProductForFront.class);
-        return StandardResponse.<ProductForFront>builder()
-                .data(productForFront)
-                .status(Status.SUCCESS)
-                .message("Product added!")
-                .build();
+
     }
-
-
-
-    public StandardResponse<String> delete(UUID id, Principal principal){
+        public StandardResponse<String> delete(UUID id, Principal principal){
         UserEntity userEntity = userRepository.findUserEntityByEmail(principal.getName());
         ProductEntity productEntity = productRepository.findProductEntityById(id);
         if (productEntity==null){
@@ -135,7 +151,8 @@ public class ProductService {
                 product.getColor(), product.getMaterial(),
                 product.getWarranty(), product.getSku(),
                 product.getBarcode(), product.getManufacturer(),
-                product.getCountryOfOrigin()));
+                product.getCountryOfOrigin(),
+                product.getIsSale(), product.getProductImage()));
     }
 
 
@@ -155,7 +172,8 @@ public class ProductService {
                 product.getColor(), product.getMaterial(),
                 product.getWarranty(), product.getSku(),
                 product.getBarcode(), product.getManufacturer(),
-                product.getCountryOfOrigin()));
+                product.getCountryOfOrigin(),
+                product.getIsSale(), product.getProductImage()));
     }
 
 
@@ -176,7 +194,8 @@ public class ProductService {
                 product.getColor(), product.getMaterial(),
                 product.getWarranty(), product.getSku(),
                 product.getBarcode(), product.getManufacturer(),
-                product.getCountryOfOrigin()));
+                product.getCountryOfOrigin(),
+                product.getIsSale(), product.getProductImage()));
     }
 
 
@@ -196,7 +215,8 @@ public class ProductService {
                 product.getColor(), product.getMaterial(),
                 product.getWarranty(), product.getSku(),
                 product.getBarcode(), product.getManufacturer(),
-                product.getCountryOfOrigin()));
+                product.getCountryOfOrigin(),
+                product.getIsSale(), product.getProductImage()));
     }
 
 
@@ -207,12 +227,21 @@ public class ProductService {
 
 
 
-    public List<ProductEntity> getByCategory(UUID id){
-        List<ProductEntity> productEntities = productRepository.findProductEntityByCategoryId(id);
+    public Page<ProductForFront> getByCategory(Pageable pageable,UUID id){
+        Page<ProductEntity> productEntities = productRepository.findProductEntityByCategoryId(pageable, id);
         if (productEntities==null){
             throw new DataNotFoundException("Product not found same this category!");
         }
-        return productEntities;
+        return productEntities.map(product -> new ProductForFront(product.getId(), product.getName(),
+                product.getDescription(), product.getPrice(),
+                product.getStock(), product.getBrand(),
+                product.getModel(), product.getCategoryId(),
+                product.getWeight(), product.getDimensions(),
+                product.getColor(), product.getMaterial(),
+                product.getWarranty(), product.getSku(),
+                product.getBarcode(), product.getManufacturer(),
+                product.getCountryOfOrigin(),
+                product.getIsSale(), product.getProductImage()));
     }
 
 
@@ -248,15 +277,16 @@ public class ProductService {
         productEntity.setBarcode(productDto.getBarcode());
         productEntity.setModel(productDto.getModel());
         productEntity.setSku(productDto.getSku());
-        productEntity.setPrice(productDto.getPrice());
+        productEntity.setPrice(Double.valueOf(productDto.getPrice()));
         productEntity.setDimensions(productDto.getDimensions());
         productEntity.setMaterial(productDto.getMaterial());
         productEntity.setCategoryId(UUID.fromString(productDto.getCategoryId()));
         productEntity.setCountryOfOrigin(productDto.getCountryOfOrigin());
         productEntity.setManufacturer(productDto.getManufacturer());
-        productEntity.setStock(productDto.getStock());
+        productEntity.setStock(Integer.valueOf(productDto.getStock()));
+        productEntity.setIsSale(Integer.valueOf(productDto.getSale()));
         productEntity.setWarranty(productDto.getWarranty());
-        productEntity.setWeight(productDto.getWeight());
+        productEntity.setWeight(Double.valueOf(productDto.getWeight()));
         productEntity.setUpdatedTime(LocalDateTime.now());
         productEntity.setUpdatedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         ProductEntity save = productRepository.save(productEntity);
@@ -267,5 +297,50 @@ public class ProductService {
                 .status(Status.SUCCESS)
                 .message("Product updated")
                 .build();
+    }
+
+
+
+
+
+
+    public Page<ProductForFront> getProductsInSale(Pageable pageable){
+       Page<ProductEntity> productEntities = productRepository.getAllProductsInSale(pageable);
+       if (productEntities==null){
+           throw new DataNotFoundException("Products not found in sale❌");
+       }
+        return productEntities.map(product -> new ProductForFront(product.getId(), product.getName(),
+                product.getDescription(), product.getPrice(),
+                product.getStock(), product.getBrand(),
+                product.getModel(), product.getCategoryId(),
+                product.getWeight(), product.getDimensions(),
+                product.getColor(), product.getMaterial(),
+                product.getWarranty(), product.getSku(),
+                product.getBarcode(), product.getManufacturer(),
+                product.getCountryOfOrigin(),
+                product.getIsSale(), product.getProductImage()));
+    }
+
+
+
+
+    public StandardResponse<ProductForFront> setSaleToProduct(UUID id, Integer sale,Principal principal){
+        ProductEntity productEntity = productRepository.findProductEntityById(id);
+        if (productEntity==null){
+            throw new DataNotFoundException("Product not found!");
+        }
+        productEntity.setIsSale(sale);
+        productEntity.setPrice(productEntity.getPrice()-(sale* productEntity.getPrice())/100);
+        productEntity.setUpdatedTime(LocalDateTime.now());
+        productEntity.setUpdatedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
+        ProductEntity save = productRepository.save(productEntity);
+        ProductForFront productForFront = modelMapper.map(save, ProductForFront.class);
+
+        return StandardResponse.<ProductForFront>builder()
+                .status(Status.SUCCESS)
+                .data(productForFront)
+                .message("Sale added in this product!")
+                .build();
+
     }
 }

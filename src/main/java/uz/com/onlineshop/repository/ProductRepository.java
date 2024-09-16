@@ -19,7 +19,12 @@ public interface ProductRepository extends JpaRepository<ProductEntity,UUID> {
 
 
     @Query("select p from products as p where p.isDeleted=false and p.categoryId=?1")
-    List<ProductEntity> findProductEntityByCategoryId(UUID id);
+    Page<ProductEntity> findProductEntityByCategoryId(Pageable pageable, UUID id);
+
+
+
+    @Query("select p from products as p where p.isDeleted=false and p.categoryId=?1")
+    List<ProductEntity> getProductEntityByCategoryId(UUID id);
 
 
 
@@ -38,7 +43,13 @@ public interface ProductRepository extends JpaRepository<ProductEntity,UUID> {
 
 
 
+
     @Query("select p from products as p where p.isDeleted=false order by p.price asc ")
     Page<ProductEntity> findAllProductsByPriceAsc(Pageable pageable);
+
+
+
+    @Query("select p from products as p where p.isSale>0 order by p.isSale asc")
+    Page<ProductEntity> getAllProductsInSale(Pageable pageable);
 
 }

@@ -4,16 +4,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.com.onlineshop.model.dto.request.user.UserDto;
 import uz.com.onlineshop.model.dto.response.ReviewForFront;
 import uz.com.onlineshop.model.dto.response.UserForFront;
+import uz.com.onlineshop.model.entity.user.UserEntity;
 import uz.com.onlineshop.response.StandardResponse;
+import uz.com.onlineshop.service.FileService;
 import uz.com.onlineshop.service.ReviewService;
 import uz.com.onlineshop.service.UserService;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -26,6 +32,7 @@ public class UserController {
 
     private final UserService userService;
     private final ReviewService reviewService;
+    private final FileService fileService;
 
 
 
@@ -157,5 +164,52 @@ public class UserController {
     ){
         Pageable pageable = PageRequest.of(page,size);
         return reviewService.findReviewsByUserId(pageable, id);
+    }
+
+
+
+
+
+
+
+
+
+    @GetMapping("/{id}/get-pdf")
+    @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
+    public ResponseEntity<byte[]> getUserPdf(@PathVariable UUID id) {
+        try {
+            byte[] pdf = fileService.generateUserPdf(id);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "user_" + id + ".pdf");
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdf);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+
+
+    @GetMapping("/get-all-excel")
+    @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
+    public ResponseEntity<byte[]> getAllUsersExcel() {
+        List<UserEntity> users = userService.getAllUsersToExcel();
+        try {
+            byte[] excelFile = fileService.generateUsersExcel(users);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", "users.xlsx");
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(excelFile);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
     }
 }

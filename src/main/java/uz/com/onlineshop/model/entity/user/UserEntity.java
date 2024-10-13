@@ -73,6 +73,6 @@ public class UserEntity extends BaseEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return username;
     }
 }

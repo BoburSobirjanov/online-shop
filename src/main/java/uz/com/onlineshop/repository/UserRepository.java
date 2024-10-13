@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import uz.com.onlineshop.model.dto.response.UserForFront;
 import uz.com.onlineshop.model.entity.user.UserEntity;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -35,4 +36,8 @@ public interface UserRepository extends JpaRepository<UserEntity,UUID> {
 
     @Query("select u from users as u where u.isDeleted=false and u.userStatus=?1")
     Page<UserEntity> findUserEntityByUserStatus(Pageable pageable, String status);
+
+
+    @Query("select u from users as u where u.isDeleted=false")
+    List<UserEntity> getAllUsersToExcel();
 }

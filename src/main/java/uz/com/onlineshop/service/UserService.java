@@ -26,6 +26,7 @@ import uz.com.onlineshop.service.auth.JwtService;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -302,5 +303,16 @@ public class UserService {
         Page<UserEntity> userEntities = userRepository.findUserEntityByUserStatus(pageable, status);
         return userEntities.map(user -> new UserForFront(user.getId(), user.getFullName(), user.getPhoneNumber(), user.getUsername(),
                 user.getEmail(), user.getAddress(), user.getRole(),user.getGender()));
+    }
+
+
+
+
+    public List<UserEntity> getAllUsersToExcel(){
+        List<UserEntity> userEntities = userRepository.getAllUsersToExcel();
+        if (userEntities==null){
+            throw new DataNotFoundException("Users not found!");
+        }
+        return userEntities;
     }
 }

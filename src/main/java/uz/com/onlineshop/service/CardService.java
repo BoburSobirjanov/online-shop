@@ -12,6 +12,7 @@ import uz.com.onlineshop.model.dto.request.CardDto;
 import uz.com.onlineshop.model.dto.response.CardForFront;
 import uz.com.onlineshop.model.entity.card.CardEntity;
 import uz.com.onlineshop.model.entity.card.CardType;
+import uz.com.onlineshop.model.entity.user.UserEntity;
 import uz.com.onlineshop.repository.CardRepository;
 import uz.com.onlineshop.repository.UserRepository;
 import uz.com.onlineshop.response.StandardResponse;
@@ -152,6 +153,18 @@ public class CardService {
                 .status(Status.SUCCESS)
                 .message("Card's balance filled!")
                 .build();
+    }
+
+
+
+
+
+    public Page<CardForFront> getMyCards(Pageable pageable,Principal principal){
+        UserEntity user = userRepository.findUserEntityByEmail(principal.getName());
+        Page<CardEntity> cards = cardRepository.findAllByUserId(pageable,user);
+
+        return cards.map(cardEntity -> new CardForFront(cardEntity.getId(), cardEntity.getCardNumber(),
+                cardEntity.getCardType(), cardEntity.getExpireDate()));
     }
 
 }

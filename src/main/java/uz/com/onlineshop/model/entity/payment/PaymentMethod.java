@@ -1,4 +1,4 @@
-package uz.com.onlineshop.model.entity.order;
+package uz.com.onlineshop.model.entity.payment;
 
 import lombok.Getter;
 
@@ -7,5 +7,7 @@ public enum PaymentMethod {
 
     CASH,
 
-    CARD
+    CARD,
+
+    CREDIT
 }

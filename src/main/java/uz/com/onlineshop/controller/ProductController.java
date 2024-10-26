@@ -1,19 +1,24 @@
 package uz.com.onlineshop.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import uz.com.onlineshop.exception.RequestValidationException;
 import uz.com.onlineshop.model.dto.request.ProductDto;
 import uz.com.onlineshop.model.dto.response.ProductForFront;
 import uz.com.onlineshop.response.StandardResponse;
 import uz.com.onlineshop.service.ProductService;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -28,11 +33,16 @@ public class ProductController {
 
     @PostMapping("/save")
     @PreAuthorize("hasRole('ADMIN')")
-    public StandardResponse<ProductForFront> save(
+    public ResponseEntity<StandardResponse<ProductForFront>> save(
+            @Valid
             @ModelAttribute ProductDto productDto,
-            @RequestParam  MultipartFile productImage
-        ){
-        return productService.save(productImage,productDto);
+            BindingResult bindingResult
+        ) throws RequestValidationException {
+        if (bindingResult.hasErrors()){
+            List<ObjectError> allErrors = bindingResult.getAllErrors();
+            throw new RequestValidationException(allErrors);
+        }
+        return ResponseEntity.ok(productService.save(productDto));
     }
 
 

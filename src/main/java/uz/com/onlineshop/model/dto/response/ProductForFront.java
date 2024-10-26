@@ -48,6 +48,4 @@ public class ProductForFront {
 
     private Integer sale;
 
-    private String productImage;
-
 }

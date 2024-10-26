@@ -2,16 +2,14 @@ package uz.com.onlineshop.model.dto.request;
 
 import lombok.*;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder
-public class OrderDto {
+public class BasketDto {
 
-    private String shippingAddress;
-
-    private String billingAddress;
-
-    private String basketId;
+    private List<String> productEntities;
 }

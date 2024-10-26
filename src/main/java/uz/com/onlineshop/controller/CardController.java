@@ -5,14 +5,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+import uz.com.onlineshop.exception.RequestValidationException;
 import uz.com.onlineshop.model.dto.request.CardDto;
 import uz.com.onlineshop.model.dto.response.CardForFront;
 import uz.com.onlineshop.response.StandardResponse;
 import uz.com.onlineshop.service.CardService;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -27,11 +32,15 @@ public class CardController {
 
 
     @PostMapping("/save-card")
-    public StandardResponse<CardForFront> save(
+    public ResponseEntity<StandardResponse<CardForFront>> save(
             @Valid @RequestBody CardDto cardDto,
-            Principal principal
-            ){
-        return cardService.save(cardDto, principal);
+            Principal principal, BindingResult bindingResult
+            ) throws RequestValidationException {
+        if (bindingResult.hasErrors()){
+            List<ObjectError> allErrors = bindingResult.getAllErrors();
+            throw new RequestValidationException(allErrors);
+        }
+        return ResponseEntity.ok(cardService.save(cardDto, principal));
     }
 
 
@@ -92,6 +101,18 @@ public class CardController {
             @RequestParam Double balance
     ){
         return cardService.fillCardBalance(id, balance);
+    }
+
+
+
+    @GetMapping("/get-my-cards")
+    public Page<CardForFront> getMyCards(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Principal principal
+    ){
+        Pageable pageable = PageRequest.of(page,size);
+        return cardService.getMyCards(pageable,principal);
     }
 
 }

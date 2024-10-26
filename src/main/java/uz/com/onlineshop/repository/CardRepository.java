@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import uz.com.onlineshop.model.entity.card.CardEntity;
+import uz.com.onlineshop.model.entity.user.UserEntity;
 
 import java.util.UUID;
 
@@ -31,4 +32,9 @@ public interface CardRepository extends JpaRepository<CardEntity, UUID> {
 
     @Query("select c from cards as c where c.isDeleted=false")
     Page<CardEntity> findAllCards(Pageable pageable);
+
+
+
+    @Query("select c from cards as c where c.isDeleted=false and c.userId=?1")
+    Page<CardEntity> findAllByUserId(Pageable pageable,UserEntity user);
 }

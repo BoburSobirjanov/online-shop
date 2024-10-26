@@ -2,11 +2,10 @@ package uz.com.onlineshop.model.entity.payment;
 
 import jakarta.persistence.*;
 import lombok.*;
+import uz.com.onlineshop.model.entity.BaseEntity;
 import uz.com.onlineshop.model.entity.order.OrderEntity;
 import uz.com.onlineshop.model.entity.user.UserEntity;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity(name = "payment")
 @AllArgsConstructor
@@ -14,15 +13,10 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-public class Payment {
+public class Payment extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
-
-    private LocalDateTime createdTime;
-
-    private PaymentStatus paymentStatus;
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
 
     @ManyToOne
     private UserEntity user;

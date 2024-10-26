@@ -2,8 +2,8 @@ package uz.com.onlineshop.model.dto.response;
 
 import lombok.*;
 import uz.com.onlineshop.model.entity.order.OrderStatus;
-import uz.com.onlineshop.model.entity.order.PaymentMethod;
 
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -16,8 +16,6 @@ public class OrderForFront {
     private UUID id;
 
     private Double totalAmount;
-
-    private PaymentMethod paymentMethod;
 
     private OrderStatus orderStatus;
 

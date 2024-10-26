@@ -66,7 +66,7 @@ public class FileService {
             document.add(new Paragraph("Tizimdagi o'rni: Direktor").setItalic());
         }
         document.add(new Paragraph("Holati: " + user.getUserStatus()).setItalic());
-        document.add(new Paragraph("Foydalanuvchi nomi: " + user.getUsername()).setItalic());
+        document.add(new Paragraph("Foydalanuvchi nomi: " + user.getRealUsername()).setItalic());
 
         document.close();
 

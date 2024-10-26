@@ -3,7 +3,6 @@ package uz.com.onlineshop.model.entity.product;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 
-import jakarta.persistence.Lob;
 import lombok.*;
 import uz.com.onlineshop.model.entity.BaseEntity;
 
@@ -69,8 +68,5 @@ public class ProductEntity extends BaseEntity {
 
     @Column(columnDefinition = "integer default 0")
     private Integer isSale;
-
-    @Lob
-    private String productImage;
 
 }

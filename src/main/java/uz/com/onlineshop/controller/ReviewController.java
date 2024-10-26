@@ -1,17 +1,23 @@
 package uz.com.onlineshop.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+import uz.com.onlineshop.exception.RequestValidationException;
 import uz.com.onlineshop.model.dto.request.ReviewDto;
 import uz.com.onlineshop.model.dto.response.ReviewForFront;
 import uz.com.onlineshop.response.StandardResponse;
 import uz.com.onlineshop.service.ReviewService;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -28,11 +34,16 @@ public class ReviewController {
 
 
     @PostMapping("/save-review")
-    public StandardResponse<ReviewForFront> save(
+    public ResponseEntity<StandardResponse<ReviewForFront>> save(
+            @Valid
             @RequestBody ReviewDto reviewDto,
-            Principal principal
-            ){
-        return reviewService.save(reviewDto, principal);
+            Principal principal, BindingResult bindingResult
+            )throws RequestValidationException {
+        if (bindingResult.hasErrors()){
+            List<ObjectError> allErrors = bindingResult.getAllErrors();
+            throw new RequestValidationException(allErrors);
+        }
+        return ResponseEntity.ok(reviewService.save(reviewDto, principal));
     }
 
 

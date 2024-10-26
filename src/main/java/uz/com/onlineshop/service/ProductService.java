@@ -8,10 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import org.springframework.web.multipart.MultipartFile;
 import uz.com.onlineshop.exception.DataNotFoundException;
 import uz.com.onlineshop.exception.NotAcceptableException;
-import uz.com.onlineshop.filter.ImageUtils;
 import uz.com.onlineshop.filter.IpAddressUtil;
 import uz.com.onlineshop.model.dto.request.ProductDto;
 import uz.com.onlineshop.model.dto.response.ProductForFront;
@@ -37,7 +35,6 @@ public class ProductService {
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-    private final ImageUtils imageUtils;
     private final Map<String, Long> ipProductViewMap = new HashMap<>();
 
 
@@ -72,18 +69,8 @@ public class ProductService {
 
 
 
-    public StandardResponse<ProductForFront> save(MultipartFile imageProduct, ProductDto productDto) {
+    public StandardResponse<ProductForFront> save(ProductDto productDto) {
         ProductEntity product = modelMapper.map(productDto, ProductEntity.class);
-        try {
-
-            if (imageProduct == null) {
-                product.setProductImage(null);
-            } else {
-                if (imageUtils.uploadImage(imageProduct)) {
-                    System.out.println("Upload successfully");
-                }
-                product.setProductImage(Base64.getEncoder().encodeToString(imageProduct.getBytes()));
-            }
             product.setDescription(productDto.getDescription());
             product.setBrand(productDto.getBrand());
             product.setColor(productDto.getColor());
@@ -112,12 +99,8 @@ public class ProductService {
                     .status(Status.SUCCESS)
                     .message("Product added!")
                     .build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
         }
 
-    }
         public StandardResponse<String> delete(UUID id, Principal principal){
         UserEntity userEntity = userRepository.findUserEntityByEmail(principal.getName());
         ProductEntity productEntity = productRepository.findProductEntityById(id);
@@ -152,7 +135,7 @@ public class ProductService {
                 product.getWarranty(), product.getSku(),
                 product.getBarcode(), product.getManufacturer(),
                 product.getCountryOfOrigin(),
-                product.getIsSale(), product.getProductImage()));
+                product.getIsSale()));
     }
 
 
@@ -173,7 +156,7 @@ public class ProductService {
                 product.getWarranty(), product.getSku(),
                 product.getBarcode(), product.getManufacturer(),
                 product.getCountryOfOrigin(),
-                product.getIsSale(), product.getProductImage()));
+                product.getIsSale()));
     }
 
 
@@ -195,7 +178,7 @@ public class ProductService {
                 product.getWarranty(), product.getSku(),
                 product.getBarcode(), product.getManufacturer(),
                 product.getCountryOfOrigin(),
-                product.getIsSale(), product.getProductImage()));
+                product.getIsSale()));
     }
 
 
@@ -216,7 +199,7 @@ public class ProductService {
                 product.getWarranty(), product.getSku(),
                 product.getBarcode(), product.getManufacturer(),
                 product.getCountryOfOrigin(),
-                product.getIsSale(), product.getProductImage()));
+                product.getIsSale()));
     }
 
 
@@ -241,7 +224,7 @@ public class ProductService {
                 product.getWarranty(), product.getSku(),
                 product.getBarcode(), product.getManufacturer(),
                 product.getCountryOfOrigin(),
-                product.getIsSale(), product.getProductImage()));
+                product.getIsSale()));
     }
 
 
@@ -318,7 +301,7 @@ public class ProductService {
                 product.getWarranty(), product.getSku(),
                 product.getBarcode(), product.getManufacturer(),
                 product.getCountryOfOrigin(),
-                product.getIsSale(), product.getProductImage()));
+                product.getIsSale()));
     }
 
 

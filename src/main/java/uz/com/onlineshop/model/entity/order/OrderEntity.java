@@ -1,12 +1,12 @@
 package uz.com.onlineshop.model.entity.order;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 import uz.com.onlineshop.model.entity.BaseEntity;
+import uz.com.onlineshop.model.entity.product.ProductEntity;
 import uz.com.onlineshop.model.entity.user.UserEntity;
+
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,13 +22,13 @@ public class OrderEntity extends BaseEntity {
     private Double totalAmount;
 
     @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod;
-
-    @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
     private String shippingAddress;
 
     private String billingAddress;
+
+    @OneToMany
+    private List<ProductEntity> productEntities;
 
 }

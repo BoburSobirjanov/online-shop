@@ -1,17 +1,13 @@
 package uz.com.onlineshop.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
-import uz.com.onlineshop.exception.RequestValidationException;
 import uz.com.onlineshop.model.dto.request.ProductDto;
 import uz.com.onlineshop.model.dto.response.ProductForFront;
 import uz.com.onlineshop.response.StandardResponse;
@@ -30,38 +26,23 @@ public class ProductController {
     private final ProductService productService;
 
 
-
     @PostMapping("/save")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<StandardResponse<ProductForFront>> save(
-            @Valid
-            @ModelAttribute ProductDto productDto,
-            BindingResult bindingResult
-        ) throws RequestValidationException {
-        if (bindingResult.hasErrors()){
-            List<ObjectError> allErrors = bindingResult.getAllErrors();
-            throw new RequestValidationException(allErrors);
-        }
+            @RequestBody ProductDto productDto
+    ){
         return ResponseEntity.ok(productService.save(productDto));
     }
-
-
-
 
 
     @DeleteMapping("/{id}/delete")
     @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
     public StandardResponse<String> delete(
             @PathVariable UUID id,
-            Principal principal
-            ){
+            Principal principal)
+    {
         return productService.delete(id, principal);
     }
-
-
-
-
-
 
 
     @GetMapping("/get-all-products")
@@ -74,11 +55,6 @@ public class ProductController {
     }
 
 
-
-
-
-
-
     @GetMapping("/get-all-products-popular")
     public Page<ProductForFront> findAllByViews(
             @RequestParam(defaultValue = "0") int page,
@@ -87,9 +63,6 @@ public class ProductController {
         Pageable pageable = PageRequest.of(page, size);
         return productService.getAllByView(pageable);
     }
-
-
-
 
 
     @GetMapping("/get-all-products-asc")
@@ -102,11 +75,6 @@ public class ProductController {
     }
 
 
-
-
-
-
-
     @GetMapping("/get-all-products-desc")
     public Page<ProductForFront> findAllByPriceDesc(
             @RequestParam(defaultValue = "0") int page,
@@ -115,12 +83,6 @@ public class ProductController {
         Pageable pageable = PageRequest.of(page, size);
         return productService.getAllByPriceDesc(pageable);
     }
-
-
-
-
-
-
 
 
     @GetMapping("/get-by-category")
@@ -134,11 +96,6 @@ public class ProductController {
     }
 
 
-
-
-
-
-
     @GetMapping("/{id}/get-by-id")
     public StandardResponse<ProductForFront> getById(
             @PathVariable UUID id,
@@ -147,11 +104,6 @@ public class ProductController {
         productService.trackView(id, request);
         return productService.getById(id);
     }
-
-
-
-
-
 
 
     @PutMapping("/update-product/{id}")
@@ -165,10 +117,6 @@ public class ProductController {
     }
 
 
-
-
-
-
     @GetMapping("/get-products-in-sale")
     public Page<ProductForFront> getAllProductsInSale(
             @RequestParam(defaultValue = "0") int page,
@@ -177,8 +125,6 @@ public class ProductController {
         Pageable pageable = PageRequest.of(page, size);
         return productService.getProductsInSale(pageable);
     }
-
-
 
 
     @PutMapping("/{id}/set-sale")
@@ -190,4 +136,28 @@ public class ProductController {
     ){
         return productService.setSaleToProduct(id, sale, principal);
     }
+
+
+
+
+    @PutMapping("/{id}/remove-sale")
+    @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
+    public StandardResponse<ProductForFront> removeSale(
+            @PathVariable  UUID id,
+            Principal principal
+    ){
+        return productService.removeSale(id, principal);
+    }
+
+
+    @DeleteMapping("/multi-delete")
+    @PreAuthorize("hasRole('ADMIN')")
+    public StandardResponse<String> multiDelete(
+            @RequestBody List<String> id,
+            Principal principal
+    ){
+        return productService.multiDeleteById(id, principal);
+    }
+
+
 }

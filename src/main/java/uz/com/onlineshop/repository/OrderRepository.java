@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import uz.com.onlineshop.model.entity.order.OrderEntity;
 import uz.com.onlineshop.model.entity.user.UserEntity;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -28,4 +29,9 @@ public interface OrderRepository extends JpaRepository<OrderEntity,UUID> {
 
     @Query("select u from orders as u where u.isDeleted=false and u.userId=?1")
     Page<OrderEntity> findOrderEntityByUserId(Pageable pageable, UserEntity user);
+
+
+
+    @Query("select u from orders as u where u.isDeleted=false and u.id in ?1")
+    List<OrderEntity> findAllById(List<UUID> id);
 }

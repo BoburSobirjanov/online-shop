@@ -123,11 +123,13 @@ public class OrderController {
 
 
 
-    @PutMapping("/{id}/pay-for-order")
-    public StandardResponse<OrderForFront> payForOrder(
-            @PathVariable UUID id,
-            @RequestParam String cardId
+
+    @DeleteMapping("/multi-delete")
+    @PreAuthorize("hasRole('ADMIN')")
+    public StandardResponse<String> multiDelete(
+            @RequestBody List<String> id,
+            Principal principal
     ){
-        return orderService.payForOrder(id, cardId);
+        return orderService.multiDeleteById(id, principal);
     }
 }

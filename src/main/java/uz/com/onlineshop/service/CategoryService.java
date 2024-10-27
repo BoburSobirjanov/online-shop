@@ -21,6 +21,7 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -143,6 +144,33 @@ public class CategoryService {
                 .data(categoryForFront)
                 .status(Status.SUCCESS)
                 .message("Category updated!")
+                .build();
+    }
+
+
+
+
+    public StandardResponse<String> multiDeleteById(List<String> id, Principal principal){
+        List<Category> categoryList = categoryRepository.findAllById(id
+                .stream()
+                .map(UUID::fromString)
+                .collect(Collectors.toList()));
+
+        if (categoryList.isEmpty()){
+            throw new DataNotFoundException("Category not found!");
+        }
+
+        for (Category category: categoryList) {
+            category.setDeletedTime(LocalDateTime.now());
+            category.setDeleted(true);
+            category.setDeletedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
+            categoryRepository.save(category);
+        }
+
+        return StandardResponse.<String>builder()
+                .status(Status.SUCCESS)
+                .message("Categories deleted!")
+                .data("DELETED")
                 .build();
     }
 }

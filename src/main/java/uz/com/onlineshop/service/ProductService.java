@@ -13,6 +13,7 @@ import uz.com.onlineshop.exception.NotAcceptableException;
 import uz.com.onlineshop.filter.IpAddressUtil;
 import uz.com.onlineshop.model.dto.request.ProductDto;
 import uz.com.onlineshop.model.dto.response.ProductForFront;
+import uz.com.onlineshop.model.entity.categories.Category;
 import uz.com.onlineshop.model.entity.product.ProductEntity;
 import uz.com.onlineshop.model.entity.user.UserEntity;
 import uz.com.onlineshop.repository.CategoryRepository;
@@ -24,6 +25,7 @@ import uz.com.onlineshop.response.Status;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -70,6 +72,7 @@ public class ProductService {
 
 
     public StandardResponse<ProductForFront> save(ProductDto productDto) {
+        Category category = categoryRepository.findCategoryById(UUID.fromString(productDto.getCategoryId()));
         ProductEntity product = modelMapper.map(productDto, ProductEntity.class);
             product.setDescription(productDto.getDescription());
             product.setBrand(productDto.getBrand());
@@ -78,19 +81,19 @@ public class ProductService {
             product.setBarcode(productDto.getBarcode());
             product.setModel(productDto.getModel());
             product.setSku(productDto.getSku());
-            product.setPrice(Double.valueOf(productDto.getPrice()));
+            product.setPrice(productDto.getPrice());
             product.setDimensions(productDto.getDimensions());
             product.setMaterial(productDto.getMaterial());
-            if (categoryRepository.findCategoryById(UUID.fromString(productDto.getCategoryId())) == null) {
+            if (category == null) {
                 throw new NotAcceptableException("Category not found! Try again!");
             }
-            product.setCategoryId(UUID.fromString(productDto.getCategoryId()));
+            product.setCategoryId(category.getId());
             product.setCountryOfOrigin(productDto.getCountryOfOrigin());
             product.setManufacturer(productDto.getManufacturer());
-            product.setStock(Integer.valueOf(productDto.getStock()));
+            product.setStock(productDto.getStock());
             product.setWarranty(productDto.getWarranty());
-            product.setWeight(Double.valueOf(productDto.getWeight()));
-            product.setIsSale(Integer.valueOf(productDto.getSale()));
+            product.setWeight(productDto.getWeight());
+            product.setIsSale(0);
             product.setViewCount(0);
             ProductEntity save = productRepository.save(product);
             ProductForFront productForFront = modelMapper.map(save, ProductForFront.class);
@@ -260,16 +263,16 @@ public class ProductService {
         productEntity.setBarcode(productDto.getBarcode());
         productEntity.setModel(productDto.getModel());
         productEntity.setSku(productDto.getSku());
-        productEntity.setPrice(Double.valueOf(productDto.getPrice()));
+        productEntity.setPrice(productDto.getPrice());
         productEntity.setDimensions(productDto.getDimensions());
         productEntity.setMaterial(productDto.getMaterial());
         productEntity.setCategoryId(UUID.fromString(productDto.getCategoryId()));
         productEntity.setCountryOfOrigin(productDto.getCountryOfOrigin());
         productEntity.setManufacturer(productDto.getManufacturer());
-        productEntity.setStock(Integer.valueOf(productDto.getStock()));
-        productEntity.setIsSale(Integer.valueOf(productDto.getSale()));
+        productEntity.setStock(productDto.getStock());
+        productEntity.setIsSale(productEntity.getIsSale());
         productEntity.setWarranty(productDto.getWarranty());
-        productEntity.setWeight(Double.valueOf(productDto.getWeight()));
+        productEntity.setWeight(productDto.getWeight());
         productEntity.setUpdatedTime(LocalDateTime.now());
         productEntity.setUpdatedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         ProductEntity save = productRepository.save(productEntity);
@@ -325,5 +328,53 @@ public class ProductService {
                 .message("Sale added in this product!")
                 .build();
 
+    }
+
+
+
+    public StandardResponse<ProductForFront> removeSale(UUID id,Principal principal){
+        UserEntity user = userRepository.findUserEntityByEmail(principal.getName());
+        ProductEntity productEntity = productRepository.findProductEntityById(id);
+        if (productEntity==null){
+            throw new DataNotFoundException("Product not found!");
+        }
+        productEntity.setPrice(100* productEntity.getPrice()/(100- productEntity.getIsSale()));
+        productEntity.setIsSale(0);
+        productEntity.setUpdatedTime(LocalDateTime.now());
+        productEntity.setUpdatedBy(user.getId());
+        ProductEntity save = productRepository.save(productEntity);
+        ProductForFront productForFront = modelMapper.map(save, ProductForFront.class);
+
+        return StandardResponse.<ProductForFront>builder()
+                .status(Status.SUCCESS)
+                .data(productForFront)
+                .message("Sale removed from product!")
+                .build();
+    }
+
+
+
+    public StandardResponse<String> multiDeleteById(List<String> id, Principal principal){
+        Optional<List<ProductEntity>> productList = productRepository.findAllById(id
+                .stream()
+                .map(UUID::fromString)
+                .collect(Collectors.toList()));
+
+        if (productList.isEmpty()){
+            throw new DataNotFoundException("Products not found!");
+        }
+
+        for (ProductEntity product: productList.get()) {
+            product.setDeletedTime(LocalDateTime.now());
+            product.setDeleted(true);
+            product.setDeletedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
+            productRepository.save(product);
+        }
+
+        return StandardResponse.<String>builder()
+                .status(Status.SUCCESS)
+                .message("Products deleted!")
+                .data("DELETED")
+                .build();
     }
 }

@@ -49,6 +49,7 @@ public class CategoryController {
 
 
 
+
     @DeleteMapping("/{id}/delete-by-id")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
     public StandardResponse<String> delete(
@@ -57,6 +58,7 @@ public class CategoryController {
             ){
         return categoryService.delete(id, principal);
     }
+
 
 
 
@@ -74,12 +76,14 @@ public class CategoryController {
 
 
 
+
     @GetMapping("/get-all-categories")
     public Page<CategoryForFront> getCategories(@RequestParam(defaultValue = "0") int page,
                                            @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return categoryService.getAllCategories(pageable);
     }
+
 
 
 
@@ -92,5 +96,17 @@ public class CategoryController {
             Principal principal
     ){
         return categoryService.update(id, categoryDto, principal);
+    }
+
+
+
+
+    @DeleteMapping("/multi-delete")
+    @PreAuthorize("hasRole('ADMIN')")
+    public StandardResponse<String> multiDelete(
+            @RequestBody List<String> id,
+            Principal principal
+    ){
+        return categoryService.multiDeleteById(id, principal);
     }
 }

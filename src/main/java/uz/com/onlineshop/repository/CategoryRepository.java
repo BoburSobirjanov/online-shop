@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import uz.com.onlineshop.model.entity.categories.Category;
 
+import java.util.List;
 import java.util.UUID;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category,UUID> {
@@ -26,4 +27,8 @@ public interface CategoryRepository extends JpaRepository<Category,UUID> {
 
     @Query("select u from categories as u where u.isDeleted=false")
     Page<Category> findAllCategories(Pageable pageable);
+
+
+    @Query("select c from categories as c where c.isDeleted=false and c.id in ?1")
+    List<Category> findAllById(List<UUID> id);
 }

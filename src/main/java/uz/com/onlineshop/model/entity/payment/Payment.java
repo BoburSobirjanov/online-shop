@@ -25,4 +25,7 @@ public class Payment extends BaseEntity {
     private OrderEntity order;
 
     private Double amount;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
 }

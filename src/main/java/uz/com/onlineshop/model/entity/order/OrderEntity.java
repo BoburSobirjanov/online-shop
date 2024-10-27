@@ -28,7 +28,7 @@ public class OrderEntity extends BaseEntity {
 
     private String billingAddress;
 
-    @OneToMany
+    @ManyToMany
     private List<ProductEntity> productEntities;
 
 }

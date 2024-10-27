@@ -6,17 +6,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.com.onlineshop.exception.DataNotFoundException;
-import uz.com.onlineshop.exception.UserBadRequestException;
 import uz.com.onlineshop.model.dto.request.OrderDto;
 import uz.com.onlineshop.model.dto.response.OrderForFront;
 import uz.com.onlineshop.model.entity.basket.Basket;
-import uz.com.onlineshop.model.entity.card.CardEntity;
 import uz.com.onlineshop.model.entity.order.OrderEntity;
 import uz.com.onlineshop.model.entity.order.OrderStatus;
 import uz.com.onlineshop.model.entity.product.ProductEntity;
-import uz.com.onlineshop.model.entity.user.UserEntity;
 import uz.com.onlineshop.repository.BasketRepository;
-import uz.com.onlineshop.repository.CardRepository;
 import uz.com.onlineshop.repository.OrderRepository;
 import uz.com.onlineshop.repository.UserRepository;
 import uz.com.onlineshop.response.StandardResponse;
@@ -27,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +34,6 @@ public class OrderService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final BasketRepository basketRepository;
-    private final CardRepository cardRepository;
 
 
 
@@ -185,30 +181,28 @@ public class OrderService {
 
 
 
-    public StandardResponse<OrderForFront> payForOrder(UUID id, String cardId){
-        OrderEntity order = orderRepository.findOrderEntityById(id);
-        if (order==null){
-            throw new DataNotFoundException("Order not found!");
-        }
-        CardEntity card =  cardRepository.findCardEntityById(UUID.fromString(cardId));
-        if (card==null){
-            throw new DataNotFoundException("Card not found!");
-        }
-        if (card.getCardBalance()<order.getTotalAmount()){
-            throw new UserBadRequestException("You have no enough balance for this order! Please, fill your balance!");
-        }
-        card.setCardBalance(card.getCardBalance()- order.getTotalAmount());
-        cardRepository.save(card);
-        order.setOrderStatus(OrderStatus.PAID);
-        OrderEntity save = orderRepository.save(order);
-        OrderForFront orderForFront = modelMapper.map(save, OrderForFront.class);
+    public StandardResponse<String> multiDeleteById(List<String> id, Principal principal){
+        List<OrderEntity> orderList = orderRepository.findAllById(id
+                .stream()
+                .map(UUID::fromString)
+                .collect(Collectors.toList()));
 
-        return StandardResponse.<OrderForFront>builder()
+        if (orderList.isEmpty()){
+            throw new DataNotFoundException("Orders not found!");
+        }
+
+        for (OrderEntity order: orderList) {
+            order.setDeletedTime(LocalDateTime.now());
+            order.setDeleted(true);
+            order.setDeletedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
+            orderRepository.save(order);
+        }
+
+        return StandardResponse.<String>builder()
                 .status(Status.SUCCESS)
-                .message("Order amount paid!")
-                .data(orderForFront)
+                .message("Orders deleted!")
+                .data("DELETED")
                 .build();
-
     }
 
 }

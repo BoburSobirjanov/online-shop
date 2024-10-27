@@ -28,6 +28,7 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -314,5 +315,32 @@ public class UserService {
             throw new DataNotFoundException("Users not found!");
         }
         return userEntities;
+    }
+
+
+
+
+    public StandardResponse<String> multiDeleteById(List<String> id, Principal principal){
+        List<UserEntity> userList = userRepository.findAllById(id
+                .stream()
+                .map(UUID::fromString)
+                .collect(Collectors.toList()));
+
+        if (userList.isEmpty()){
+            throw new DataNotFoundException("Users not found!");
+        }
+
+        for (UserEntity user: userList) {
+            user.setDeletedTime(LocalDateTime.now());
+            user.setDeleted(true);
+            user.setDeletedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
+            userRepository.save(user);
+        }
+
+        return StandardResponse.<String>builder()
+                .status(Status.SUCCESS)
+                .message("Users deleted!")
+                .data("DELETED")
+                .build();
     }
 }

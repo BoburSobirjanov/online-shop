@@ -212,4 +212,15 @@ public class UserController {
             return ResponseEntity.status(500).build();
         }
     }
+
+
+
+    @DeleteMapping("/multi-delete")
+    @PreAuthorize("hasRole('ADMIN')")
+    public StandardResponse<String> multiDelete(
+            @RequestBody List<String> id,
+            Principal principal
+    ){
+        return userService.multiDeleteById(id, principal);
+    }
 }

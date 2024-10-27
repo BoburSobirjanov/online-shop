@@ -13,9 +13,9 @@ public class ProductDto {
 
     private String description;
 
-    private String price;
+    private Double price;
 
-    private String stock;
+    private Integer stock;
 
     private String brand;
 
@@ -23,7 +23,7 @@ public class ProductDto {
 
     private String categoryId;
 
-    private String weight;
+    private Double weight;
 
     private String dimensions;
 
@@ -40,7 +40,5 @@ public class ProductDto {
     private String manufacturer;
 
     private String countryOfOrigin;
-
-    private String sale;
 
 }

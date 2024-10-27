@@ -7,9 +7,9 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class OrderItemDto {
+public class PaymentDto {
 
-    private Integer quantity;
+    private String orderId;
 
-    private Double price;
+    private String cardId;
 }

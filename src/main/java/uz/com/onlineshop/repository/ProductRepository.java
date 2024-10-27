@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import uz.com.onlineshop.model.entity.product.ProductEntity;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity,UUID> {
@@ -51,5 +52,10 @@ public interface ProductRepository extends JpaRepository<ProductEntity,UUID> {
 
     @Query("select p from products as p where p.isSale>0 order by p.isSale asc")
     Page<ProductEntity> getAllProductsInSale(Pageable pageable);
+
+
+
+    @Query("select p from products as p where p.isDeleted=false and p.id in ?1")
+    Optional<List<ProductEntity>> findAllById(List<UUID> id);
 
 }

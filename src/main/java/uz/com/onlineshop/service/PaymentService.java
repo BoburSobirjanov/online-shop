@@ -46,6 +46,12 @@ public class PaymentService {
         if (order==null){
             throw new DataNotFoundException("Order not found!");
         }
+        if (order.getOrderStatus()==OrderStatus.PAID){
+            throw new UserBadRequestException("You have already paid for this order!");
+        }
+        if (order.getOrderStatus()==OrderStatus.CANCELLED){
+            throw new UserBadRequestException("Can not pay for canceled orders!");
+        }
         CardEntity card =  cardRepository.findCardEntityById(UUID.fromString(paymentDto.getCardId()));
         if (card==null){
             throw new DataNotFoundException("Card not found!");

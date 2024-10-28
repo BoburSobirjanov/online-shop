@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.com.onlineshop.exception.DataNotFoundException;
+import uz.com.onlineshop.exception.NotAcceptableException;
+import uz.com.onlineshop.exception.UserBadRequestException;
 import uz.com.onlineshop.model.dto.request.OrderDto;
 import uz.com.onlineshop.model.dto.response.OrderForFront;
 import uz.com.onlineshop.model.entity.basket.Basket;
@@ -19,6 +21,7 @@ import uz.com.onlineshop.response.StandardResponse;
 import uz.com.onlineshop.response.Status;
 
 import java.security.Principal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -104,6 +107,12 @@ public class OrderService {
         OrderEntity order = orderRepository.findOrderEntityById(id);
         if (order==null){
             throw new DataNotFoundException("Order not found!");
+        }
+        if (Duration.between(LocalDateTime.now(), order.getCreatedTime()).toMinutes() > 30){
+            throw new NotAcceptableException("Can not cancel this order!");
+        }
+        if (order.getOrderStatus()==OrderStatus.PAID){
+            throw new UserBadRequestException("Can not cancel this order. Because you have already paid for this!");
         }
         order.setOrderStatus(OrderStatus.CANCELLED);
         OrderEntity save = orderRepository.save(order);

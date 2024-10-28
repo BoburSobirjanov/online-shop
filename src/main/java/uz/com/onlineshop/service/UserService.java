@@ -343,4 +343,36 @@ public class UserService {
                 .data("DELETED")
                 .build();
     }
+
+
+
+
+
+    public StandardResponse<UserForFront> searchUserByNumber(String number){
+        UserEntity user = userRepository.findUserEntityByPhoneNumber(number);
+        if (user==null){
+            throw new DataNotFoundException("User not found!");
+        }
+        UserForFront userForFront = modelMapper.map(user, UserForFront.class);
+
+        return StandardResponse.<UserForFront>builder()
+                .status(Status.SUCCESS)
+                .message("This is user!")
+                .data(userForFront)
+                .build();
+    }
+
+
+
+
+
+    public Page<UserForFront> searchByName(String name, Pageable pageable){
+        Page<UserEntity> userEntities = userRepository.findUserEntityByFullName(name, pageable);
+        if (userEntities.isEmpty()){
+            throw new DataNotFoundException("User not found!");
+        }
+
+        return userEntities.map(user -> new UserForFront(user.getId(), user.getFullName(), user.getPhoneNumber(),
+                user.getUsername(), user.getEmail(), user.getAddress(), user.getRole(),user.getGender()));
+    }
 }

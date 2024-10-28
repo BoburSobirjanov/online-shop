@@ -223,4 +223,27 @@ public class UserController {
     ){
         return userService.multiDeleteById(id, principal);
     }
+
+
+
+    @GetMapping("/search-by-number")
+    @PreAuthorize("hasRole('ADMIN')")
+    public StandardResponse<UserForFront> searchByNumber(
+            @RequestParam String number
+    ){
+        return userService.searchUserByNumber(number);
+    }
+
+
+
+    @GetMapping("/search-by-name")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Page<UserForFront> searchByName(
+            @RequestParam String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        Pageable pageable = PageRequest.of(page,size);
+        return userService.searchByName(name,pageable);
+    }
 }

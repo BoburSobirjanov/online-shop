@@ -9,6 +9,7 @@ import uz.com.onlineshop.response.StandardResponse;
 import uz.com.onlineshop.service.PaymentService;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -44,5 +45,17 @@ public class PaymentController {
             Principal principal
     ){
         return paymentService.deleteById(id, principal);
+    }
+
+
+
+
+    @DeleteMapping("/multi-delete")
+    @PreAuthorize("hasRole('ADMIN')")
+    public StandardResponse<String> multiDelete(
+            @RequestBody List<String> id,
+            Principal principal
+    ){
+       return paymentService.multiDeleteById(id, principal);
     }
 }

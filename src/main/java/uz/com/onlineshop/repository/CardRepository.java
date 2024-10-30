@@ -37,4 +37,8 @@ public interface CardRepository extends JpaRepository<CardEntity, UUID> {
 
     @Query("select c from cards as c where c.isDeleted=false and c.userId=?1")
     Page<CardEntity> findAllByUserId(Pageable pageable,UserEntity user);
+
+
+    @Query("select c from cards as c where c.isDeleted=false and c.userId=?1")
+    CardEntity findCardEntityByUserId(UserEntity user);
 }

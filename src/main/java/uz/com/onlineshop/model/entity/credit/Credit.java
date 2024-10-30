@@ -45,4 +45,6 @@ public class Credit extends BaseEntity {
 
     @OneToOne
     private OrderEntity order;
+
+    private Double monthlyPayment;
 }

@@ -11,10 +11,12 @@ import uz.com.onlineshop.exception.UserBadRequestException;
 import uz.com.onlineshop.model.dto.request.OrderDto;
 import uz.com.onlineshop.model.dto.response.OrderForFront;
 import uz.com.onlineshop.model.entity.basket.Basket;
+import uz.com.onlineshop.model.entity.credit.Credit;
 import uz.com.onlineshop.model.entity.order.OrderEntity;
 import uz.com.onlineshop.model.entity.order.OrderStatus;
 import uz.com.onlineshop.model.entity.product.ProductEntity;
 import uz.com.onlineshop.repository.BasketRepository;
+import uz.com.onlineshop.repository.CreditRepository;
 import uz.com.onlineshop.repository.OrderRepository;
 import uz.com.onlineshop.repository.UserRepository;
 import uz.com.onlineshop.response.StandardResponse;
@@ -37,6 +39,7 @@ public class OrderService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final BasketRepository basketRepository;
+    private final CreditRepository creditRepository;
 
 
 
@@ -89,6 +92,24 @@ public class OrderService {
         if (order==null){
             throw new DataNotFoundException("Order not found!");
         }
+        if (order.getOrderStatus()==OrderStatus.PAID){
+            Optional<Credit> creditByOrder = creditRepository.findCreditByOrder(order);
+            if (creditByOrder.isEmpty()){
+                order.setDeleted(true);
+                order.setDeletedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
+                order.setDeletedTime(LocalDateTime.now());
+                orderRepository.save(order);
+
+                return StandardResponse.<String>builder()
+                        .data("DELETED")
+                        .status(Status.SUCCESS)
+                        .message("Order deleted!")
+                        .build();
+            }
+            if (creditByOrder.get().getCreditAmount()>0){
+                throw new NotAcceptableException("Can not delete this order. There is a credit associated with this order. Please, pay for credit firstly!");
+            }
+        }
         order.setDeleted(true);
         order.setDeletedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         order.setDeletedTime(LocalDateTime.now());
@@ -99,6 +120,7 @@ public class OrderService {
                 .status(Status.SUCCESS)
                 .message("Order deleted!")
                 .build();
+
     }
 
 

@@ -14,10 +14,6 @@ public class CreditDto {
 
     private Integer creditMonths;
 
-    private Double hasBeenPaid;
-
-    private Double mustBePaid;
-
     private String order;
 
 }

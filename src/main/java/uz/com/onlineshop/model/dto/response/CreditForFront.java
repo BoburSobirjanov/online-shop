@@ -35,4 +35,6 @@ public class CreditForFront {
 
     private OrderForFront order;
 
+    private Double monthlyPayment;
+
 }

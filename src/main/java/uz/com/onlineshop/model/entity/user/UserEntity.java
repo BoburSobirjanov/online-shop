@@ -12,6 +12,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import uz.com.onlineshop.model.entity.BaseEntity;
+import uz.com.onlineshop.model.enums.Gender;
+import uz.com.onlineshop.model.enums.UserRole;
+import uz.com.onlineshop.model.enums.UserStatus;
 
 import java.util.ArrayList;
 import java.util.Collection;

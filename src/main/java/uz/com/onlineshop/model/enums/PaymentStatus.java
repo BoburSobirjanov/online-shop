@@ -1,0 +1,8 @@
+package uz.com.onlineshop.model.enums;
+
+public enum PaymentStatus {
+
+    COMPLETED,
+
+    FAILED
+}

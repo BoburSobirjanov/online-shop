@@ -12,8 +12,8 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import uz.com.onlineshop.exception.RequestValidationException;
 import uz.com.onlineshop.model.dto.request.OrderDto;
-import uz.com.onlineshop.model.dto.response.OrderForFront;
-import uz.com.onlineshop.response.StandardResponse;
+import uz.com.onlineshop.model.dto.response.OrderForFrontDto;
+import uz.com.onlineshop.standard.StandardResponse;
 import uz.com.onlineshop.service.OrderService;
 
 import java.security.Principal;
@@ -30,7 +30,7 @@ public class OrderController {
 
 
     @PostMapping("/save")
-    public ResponseEntity<StandardResponse<OrderForFront>> save(
+    public ResponseEntity<StandardResponse<OrderForFrontDto>> save(
             @Valid
             @RequestBody OrderDto orderDto,
             Principal principal, BindingResult bindingResult
@@ -46,7 +46,7 @@ public class OrderController {
 
 
     @GetMapping("/get-by-id/{id}")
-    public StandardResponse<OrderForFront> getById(
+    public StandardResponse<OrderForFrontDto> getById(
             @PathVariable UUID id
             ){
         return orderService.getById(id);
@@ -67,7 +67,7 @@ public class OrderController {
 
 
     @PutMapping("/{id}/cancel")
-    public StandardResponse<OrderForFront> cancel(
+    public StandardResponse<OrderForFrontDto> cancel(
             @PathVariable UUID id
     ){
         return orderService.cancelOrder(id);
@@ -77,7 +77,7 @@ public class OrderController {
 
 
     @PutMapping("/update-order/{id}")
-    public StandardResponse<OrderForFront> update(
+    public StandardResponse<OrderForFrontDto> update(
             @PathVariable UUID id,
             @RequestBody OrderDto orderDto,
             Principal principal
@@ -89,7 +89,7 @@ public class OrderController {
 
     @GetMapping("/get-cancelled-orders")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
-    public Page<OrderForFront> getCancelled(
+    public Page<OrderForFrontDto> getCancelled(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ){
@@ -100,7 +100,7 @@ public class OrderController {
 
 
     @GetMapping("/get-my-orders")
-    public Page<OrderForFront> getMyOrders(
+    public Page<OrderForFrontDto> getMyOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Principal principal

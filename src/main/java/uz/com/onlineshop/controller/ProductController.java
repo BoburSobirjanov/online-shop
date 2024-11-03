@@ -9,8 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.com.onlineshop.model.dto.request.ProductDto;
-import uz.com.onlineshop.model.dto.response.ProductForFront;
-import uz.com.onlineshop.response.StandardResponse;
+import uz.com.onlineshop.model.dto.response.ProductForFrontDto;
+import uz.com.onlineshop.standard.StandardResponse;
 import uz.com.onlineshop.service.ProductService;
 
 import java.security.Principal;
@@ -28,7 +28,7 @@ public class ProductController {
 
     @PostMapping("/save")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<StandardResponse<ProductForFront>> save(
+    public ResponseEntity<StandardResponse<ProductForFrontDto>> save(
             @RequestBody ProductDto productDto
     ){
         return ResponseEntity.ok(productService.save(productDto));
@@ -46,7 +46,7 @@ public class ProductController {
 
 
     @GetMapping("/get-all-products")
-    public Page<ProductForFront> findAllProducts(
+    public Page<ProductForFrontDto> findAllProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ){
@@ -56,7 +56,7 @@ public class ProductController {
 
 
     @GetMapping("/get-all-products-popular")
-    public Page<ProductForFront> findAllByViews(
+    public Page<ProductForFrontDto> findAllByViews(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ){
@@ -66,7 +66,7 @@ public class ProductController {
 
 
     @GetMapping("/get-all-products-asc")
-    public Page<ProductForFront> findAllByPriceAsc(
+    public Page<ProductForFrontDto> findAllByPriceAsc(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ){
@@ -76,7 +76,7 @@ public class ProductController {
 
 
     @GetMapping("/get-all-products-desc")
-    public Page<ProductForFront> findAllByPriceDesc(
+    public Page<ProductForFrontDto> findAllByPriceDesc(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ){
@@ -86,7 +86,7 @@ public class ProductController {
 
 
     @GetMapping("/get-by-category")
-    public Page<ProductForFront> getByCategory(
+    public Page<ProductForFrontDto> getByCategory(
             @RequestParam UUID id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -97,7 +97,7 @@ public class ProductController {
 
 
     @GetMapping("/{id}/get-by-id")
-    public StandardResponse<ProductForFront> getById(
+    public StandardResponse<ProductForFrontDto> getById(
             @PathVariable UUID id,
             HttpServletRequest request
     ){
@@ -108,7 +108,7 @@ public class ProductController {
 
     @PutMapping("/update-product/{id}")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
-    public StandardResponse<ProductForFront> update(
+    public StandardResponse<ProductForFrontDto> update(
             @PathVariable UUID id,
             @RequestBody ProductDto productDto,
             Principal principal
@@ -118,7 +118,7 @@ public class ProductController {
 
 
     @GetMapping("/get-products-in-sale")
-    public Page<ProductForFront> getAllProductsInSale(
+    public Page<ProductForFrontDto> getAllProductsInSale(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ){
@@ -129,7 +129,7 @@ public class ProductController {
 
     @PutMapping("/{id}/set-sale")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
-    public StandardResponse<ProductForFront> setSaleToProduct(
+    public StandardResponse<ProductForFrontDto> setSaleToProduct(
             @PathVariable UUID id,
             @RequestParam Integer sale,
             Principal principal
@@ -142,7 +142,7 @@ public class ProductController {
 
     @PutMapping("/{id}/remove-sale")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
-    public StandardResponse<ProductForFront> removeSale(
+    public StandardResponse<ProductForFrontDto> removeSale(
             @PathVariable  UUID id,
             Principal principal
     ){

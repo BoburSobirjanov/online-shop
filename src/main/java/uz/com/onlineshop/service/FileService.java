@@ -12,9 +12,9 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import uz.com.onlineshop.exception.DataNotFoundException;
-import uz.com.onlineshop.model.entity.user.Gender;
+import uz.com.onlineshop.model.enums.Gender;
 import uz.com.onlineshop.model.entity.user.UserEntity;
-import uz.com.onlineshop.model.entity.user.UserRole;
+import uz.com.onlineshop.model.enums.UserRole;
 import uz.com.onlineshop.repository.UserRepository;
 
 import java.io.ByteArrayOutputStream;

@@ -10,7 +10,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-public class ProductForFront {
+public class ProductForFrontDto {
 
     private UUID id;
 

@@ -5,14 +5,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uz.com.onlineshop.model.dto.request.BasketDto;
-import uz.com.onlineshop.model.dto.response.BasketForFront;
+import uz.com.onlineshop.model.dto.response.BasketForFrontDto;
 import uz.com.onlineshop.model.entity.basket.Basket;
 import uz.com.onlineshop.model.entity.product.ProductEntity;
 import uz.com.onlineshop.repository.BasketRepository;
 import uz.com.onlineshop.repository.ProductRepository;
 import uz.com.onlineshop.repository.UserRepository;
-import uz.com.onlineshop.response.StandardResponse;
-import uz.com.onlineshop.response.Status;
+import uz.com.onlineshop.standard.StandardResponse;
+import uz.com.onlineshop.standard.Status;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class BasketService {
 
 
     @Transactional
-    public StandardResponse<BasketForFront> save(BasketDto basketDto, Principal principal){
+    public StandardResponse<BasketForFrontDto> save(BasketDto basketDto, Principal principal){
         List<ProductEntity> productEntities = new ArrayList<>();
         List<String> products = basketDto.getProductEntities();
         for (String id : products){
@@ -41,11 +41,11 @@ public class BasketService {
         basket.setProduct(productEntities);
         basket.setUser(userRepository.findUserEntityByEmail(principal.getName()));
         Basket save = basketRepository.save(basket);
-        BasketForFront basketForFront = modelMapper.map(save, BasketForFront.class);
+        BasketForFrontDto basketForFrontDto = modelMapper.map(save, BasketForFrontDto.class);
 
-        return StandardResponse.<BasketForFront>builder()
+        return StandardResponse.<BasketForFrontDto>builder()
                 .status(Status.SUCCESS)
-                .data(basketForFront)
+                .data(basketForFrontDto)
                 .message("Basket created!")
                 .build();
     }

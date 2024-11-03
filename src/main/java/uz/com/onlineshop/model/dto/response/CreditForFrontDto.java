@@ -1,7 +1,7 @@
 package uz.com.onlineshop.model.dto.response;
 
 import lombok.*;
-import uz.com.onlineshop.model.entity.credit.CreditStatus;
+import uz.com.onlineshop.model.enums.CreditStatus;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -11,7 +11,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-public class CreditForFront {
+public class CreditForFrontDto {
 
     private UUID id;
 
@@ -25,7 +25,7 @@ public class CreditForFront {
 
     private Integer creditMonths;
 
-    private UserForFront user;
+    private UserForFrontDto user;
 
     private Double hasBeenPaid;
 
@@ -33,7 +33,7 @@ public class CreditForFront {
 
     private CreditStatus creditStatus;
 
-    private OrderForFront order;
+    private OrderForFrontDto order;
 
     private Double monthlyPayment;
 

@@ -1,7 +1,7 @@
-package uz.com.onlineshop.response;
+package uz.com.onlineshop.standard;
 
 import lombok.*;
-import uz.com.onlineshop.model.dto.response.UserForFront;
+import uz.com.onlineshop.model.dto.response.UserForFrontDto;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,5 +14,5 @@ public class JwtResponse {
 
     private String refreshToken;
 
-    private UserForFront userForFront;
+    private UserForFrontDto userForFrontDto;
 }

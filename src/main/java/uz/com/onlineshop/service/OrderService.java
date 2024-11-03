@@ -9,18 +9,18 @@ import uz.com.onlineshop.exception.DataNotFoundException;
 import uz.com.onlineshop.exception.NotAcceptableException;
 import uz.com.onlineshop.exception.UserBadRequestException;
 import uz.com.onlineshop.model.dto.request.OrderDto;
-import uz.com.onlineshop.model.dto.response.OrderForFront;
+import uz.com.onlineshop.model.dto.response.OrderForFrontDto;
 import uz.com.onlineshop.model.entity.basket.Basket;
 import uz.com.onlineshop.model.entity.credit.Credit;
 import uz.com.onlineshop.model.entity.order.OrderEntity;
-import uz.com.onlineshop.model.entity.order.OrderStatus;
+import uz.com.onlineshop.model.enums.OrderStatus;
 import uz.com.onlineshop.model.entity.product.ProductEntity;
 import uz.com.onlineshop.repository.BasketRepository;
 import uz.com.onlineshop.repository.CreditRepository;
 import uz.com.onlineshop.repository.OrderRepository;
 import uz.com.onlineshop.repository.UserRepository;
-import uz.com.onlineshop.response.StandardResponse;
-import uz.com.onlineshop.response.Status;
+import uz.com.onlineshop.standard.StandardResponse;
+import uz.com.onlineshop.standard.Status;
 
 import java.security.Principal;
 import java.time.Duration;
@@ -43,7 +43,7 @@ public class OrderService {
 
 
 
-    public StandardResponse<OrderForFront> save(OrderDto orderDto, Principal principal){
+    public StandardResponse<OrderForFrontDto> save(OrderDto orderDto, Principal principal){
         Optional<Basket> basket = basketRepository.findBasketById(UUID.fromString(orderDto.getBasketId()));
         OrderEntity order = modelMapper.map(orderDto, OrderEntity.class);
         order.setOrderStatus(OrderStatus.PENDING);
@@ -59,10 +59,10 @@ public class OrderService {
         order.setUserId(userRepository.findUserEntityByEmail(principal.getName()));
         OrderEntity save = orderRepository.save(order);
         basketRepository.delete(basket.get());
-        OrderForFront orderForFront = modelMapper.map(save, OrderForFront.class);
+        OrderForFrontDto orderForFrontDto = modelMapper.map(save, OrderForFrontDto.class);
 
-        return StandardResponse.<OrderForFront>builder()
-                .data(orderForFront)
+        return StandardResponse.<OrderForFrontDto>builder()
+                .data(orderForFrontDto)
                 .status(Status.SUCCESS)
                 .message("Order saved!")
                 .build();
@@ -70,14 +70,14 @@ public class OrderService {
 
 
 
-    public StandardResponse<OrderForFront> getById(UUID id){
+    public StandardResponse<OrderForFrontDto> getById(UUID id){
         OrderEntity order = orderRepository.findOrderEntityById(id);
         if (order==null){
             throw new DataNotFoundException("Order not found!");
         }
-        OrderForFront orderForFront = modelMapper.map(order, OrderForFront.class);
-        return StandardResponse.<OrderForFront>builder()
-                .data(orderForFront)
+        OrderForFrontDto orderForFrontDto = modelMapper.map(order, OrderForFrontDto.class);
+        return StandardResponse.<OrderForFrontDto>builder()
+                .data(orderForFrontDto)
                 .status(Status.SUCCESS)
                 .message("This is order!")
                 .build();
@@ -125,7 +125,7 @@ public class OrderService {
 
 
 
-    public StandardResponse<OrderForFront> cancelOrder(UUID id){
+    public StandardResponse<OrderForFrontDto> cancelOrder(UUID id){
         OrderEntity order = orderRepository.findOrderEntityById(id);
         if (order==null){
             throw new DataNotFoundException("Order not found!");
@@ -138,10 +138,10 @@ public class OrderService {
         }
         order.setOrderStatus(OrderStatus.CANCELLED);
         OrderEntity save = orderRepository.save(order);
-        OrderForFront orderForFront = modelMapper.map(save, OrderForFront.class);
+        OrderForFrontDto orderForFrontDto = modelMapper.map(save, OrderForFrontDto.class);
 
-        return StandardResponse.<OrderForFront>builder()
-                .data(orderForFront)
+        return StandardResponse.<OrderForFrontDto>builder()
+                .data(orderForFrontDto)
                 .status(Status.SUCCESS)
                 .message("Order cancelled!")
                 .build();
@@ -150,7 +150,7 @@ public class OrderService {
 
 
 
-    public StandardResponse<OrderForFront> updateOrder(UUID id, OrderDto orderDto, Principal principal){
+    public StandardResponse<OrderForFrontDto> updateOrder(UUID id, OrderDto orderDto, Principal principal){
         OrderEntity order = orderRepository.findOrderEntityById(id);
         if (order==null){
             throw new DataNotFoundException("Order not found!");
@@ -162,10 +162,10 @@ public class OrderService {
         order.setUpdatedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         order.setUserId(userRepository.findUserEntityByEmail(principal.getName()));
         OrderEntity save = orderRepository.save(order);
-        OrderForFront orderForFront = modelMapper.map(save, OrderForFront.class);
+        OrderForFrontDto orderForFrontDto = modelMapper.map(save, OrderForFrontDto.class);
 
-        return StandardResponse.<OrderForFront>builder()
-                .data(orderForFront)
+        return StandardResponse.<OrderForFrontDto>builder()
+                .data(orderForFrontDto)
                 .status(Status.SUCCESS)
                 .message("Order updated!")
                 .build();
@@ -173,18 +173,18 @@ public class OrderService {
 
 
 
-    public Page<OrderForFront> getCancelledOrders(Pageable pageable){
+    public Page<OrderForFrontDto> getCancelledOrders(Pageable pageable){
         Page<OrderEntity> orderEntities = orderRepository.findOrderEntityByOrderStatus(pageable);
-       return  orderEntities.map(order -> new OrderForFront(order.getId(),order.getTotalAmount(),
+       return  orderEntities.map(order -> new OrderForFrontDto(order.getId(),order.getTotalAmount(),
                order.getOrderStatus(),
                order.getShippingAddress(), order.getBillingAddress()));
     }
 
 
 
-    public Page<OrderForFront> getMyOrders(Pageable pageable, Principal principal){
+    public Page<OrderForFrontDto> getMyOrders(Pageable pageable, Principal principal){
         Page<OrderEntity> orderEntities = orderRepository.findOrderEntityByUserId(pageable,userRepository.findUserEntityByEmail(principal.getName()));
-        return orderEntities.map(order -> new OrderForFront(order.getId(),order.getTotalAmount(),order.getOrderStatus(),
+        return orderEntities.map(order -> new OrderForFrontDto(order.getId(),order.getTotalAmount(),order.getOrderStatus(),
                 order.getShippingAddress(), order.getBillingAddress()));
     }
 

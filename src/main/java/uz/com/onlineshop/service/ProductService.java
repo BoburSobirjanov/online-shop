@@ -11,16 +11,16 @@ import org.springframework.stereotype.Service;
 import uz.com.onlineshop.exception.DataNotFoundException;
 import uz.com.onlineshop.exception.NotAcceptableException;
 import uz.com.onlineshop.filter.IpAddressUtil;
+import uz.com.onlineshop.mapper.ProductMapper;
 import uz.com.onlineshop.model.dto.request.ProductDto;
-import uz.com.onlineshop.model.dto.response.ProductForFront;
+import uz.com.onlineshop.model.dto.response.ProductForFrontDto;
 import uz.com.onlineshop.model.entity.categories.Category;
 import uz.com.onlineshop.model.entity.product.ProductEntity;
 import uz.com.onlineshop.model.entity.user.UserEntity;
 import uz.com.onlineshop.repository.CategoryRepository;
 import uz.com.onlineshop.repository.ProductRepository;
 import uz.com.onlineshop.repository.UserRepository;
-import uz.com.onlineshop.response.StandardResponse;
-import uz.com.onlineshop.response.Status;
+import uz.com.onlineshop.standard.StandardResponse;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -37,6 +37,7 @@ public class ProductService {
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final ProductMapper productMapper;
     private final Map<String, Long> ipProductViewMap = new HashMap<>();
 
 
@@ -71,7 +72,7 @@ public class ProductService {
 
 
 
-    public StandardResponse<ProductForFront> save(ProductDto productDto) {
+    public StandardResponse<ProductForFrontDto> save(ProductDto productDto) {
         Category category = categoryRepository.findCategoryById(UUID.fromString(productDto.getCategoryId()));
         ProductEntity product = modelMapper.map(productDto, ProductEntity.class);
             product.setDescription(productDto.getDescription());
@@ -96,12 +97,8 @@ public class ProductService {
             product.setIsSale(0);
             product.setViewCount(0);
             ProductEntity save = productRepository.save(product);
-            ProductForFront productForFront = modelMapper.map(save, ProductForFront.class);
-            return StandardResponse.<ProductForFront>builder()
-                    .data(productForFront)
-                    .status(Status.SUCCESS)
-                    .message("Product added!")
-                    .build();
+            ProductForFrontDto productForFrontDto = modelMapper.map(save, ProductForFrontDto.class);
+            return StandardResponse.ok("Product added!",productForFrontDto);
         }
 
         public StandardResponse<String> delete(UUID id, Principal principal){
@@ -115,11 +112,7 @@ public class ProductService {
         productEntity.setDeletedBy(userEntity.getId());
         productRepository.save(productEntity);
 
-        return StandardResponse.<String>builder()
-                .data("DELETED")
-                .status(Status.SUCCESS)
-                .message("Product has deleted successfully!")
-                .build();
+        return StandardResponse.ok("Product has deleted successfully!","DELETED");
     }
 
 
@@ -127,18 +120,9 @@ public class ProductService {
 
 
 
-    public Page<ProductForFront> getAllProducts(Pageable pageable){
+    public Page<ProductForFrontDto> getAllProducts(Pageable pageable){
         Page<ProductEntity> productEntities = productRepository.findAllProducts(pageable);
-        return productEntities.map(product -> new ProductForFront(product.getId(), product.getName(),
-                product.getDescription(), product.getPrice(),
-                product.getStock(), product.getBrand(),
-                product.getModel(), product.getCategoryId(),
-                product.getWeight(), product.getDimensions(),
-                product.getColor(), product.getMaterial(),
-                product.getWarranty(), product.getSku(),
-                product.getBarcode(), product.getManufacturer(),
-                product.getCountryOfOrigin(),
-                product.getIsSale()));
+        return productEntities.map(productMapper::toDto);
     }
 
 
@@ -148,18 +132,9 @@ public class ProductService {
 
 
 
-    public Page<ProductForFront> getAllByView(Pageable pageable){
+    public Page<ProductForFrontDto> getAllByView(Pageable pageable){
         Page<ProductEntity> productEntities = productRepository.findAllByViewCount(pageable);
-        return productEntities.map(product -> new ProductForFront(product.getId(), product.getName(),
-                product.getDescription(), product.getPrice(),
-                product.getStock(), product.getBrand(),
-                product.getModel(), product.getCategoryId(),
-                product.getWeight(), product.getDimensions(),
-                product.getColor(), product.getMaterial(),
-                product.getWarranty(), product.getSku(),
-                product.getBarcode(), product.getManufacturer(),
-                product.getCountryOfOrigin(),
-                product.getIsSale()));
+        return productEntities.map(productMapper::toDto);
     }
 
 
@@ -170,18 +145,9 @@ public class ProductService {
 
 
 
-    public Page<ProductForFront> getAllByPriceAsc(Pageable pageable){
+    public Page<ProductForFrontDto> getAllByPriceAsc(Pageable pageable){
         Page<ProductEntity> productEntities = productRepository.findAllProductsByPriceAsc(pageable);
-        return productEntities.map(product -> new ProductForFront(product.getId(), product.getName(),
-                product.getDescription(), product.getPrice(),
-                product.getStock(), product.getBrand(),
-                product.getModel(), product.getCategoryId(),
-                product.getWeight(), product.getDimensions(),
-                product.getColor(), product.getMaterial(),
-                product.getWarranty(), product.getSku(),
-                product.getBarcode(), product.getManufacturer(),
-                product.getCountryOfOrigin(),
-                product.getIsSale()));
+        return productEntities.map(productMapper::toDto);
     }
 
 
@@ -191,18 +157,9 @@ public class ProductService {
 
 
 
-    public Page<ProductForFront> getAllByPriceDesc(Pageable pageable){
+    public Page<ProductForFrontDto> getAllByPriceDesc(Pageable pageable){
         Page<ProductEntity> productEntities = productRepository.findAllByPriceDesc(pageable);
-        return productEntities.map(product -> new ProductForFront(product.getId(), product.getName(),
-                product.getDescription(), product.getPrice(),
-                product.getStock(), product.getBrand(),
-                product.getModel(), product.getCategoryId(),
-                product.getWeight(), product.getDimensions(),
-                product.getColor(), product.getMaterial(),
-                product.getWarranty(), product.getSku(),
-                product.getBarcode(), product.getManufacturer(),
-                product.getCountryOfOrigin(),
-                product.getIsSale()));
+        return productEntities.map(productMapper::toDto);
     }
 
 
@@ -213,45 +170,32 @@ public class ProductService {
 
 
 
-    public Page<ProductForFront> getByCategory(Pageable pageable,UUID id){
+    public Page<ProductForFrontDto> getByCategory(Pageable pageable, UUID id){
         Page<ProductEntity> productEntities = productRepository.findProductEntityByCategoryId(pageable, id);
         if (productEntities==null){
             throw new DataNotFoundException("Product not found same this category!");
         }
-        return productEntities.map(product -> new ProductForFront(product.getId(), product.getName(),
-                product.getDescription(), product.getPrice(),
-                product.getStock(), product.getBrand(),
-                product.getModel(), product.getCategoryId(),
-                product.getWeight(), product.getDimensions(),
-                product.getColor(), product.getMaterial(),
-                product.getWarranty(), product.getSku(),
-                product.getBarcode(), product.getManufacturer(),
-                product.getCountryOfOrigin(),
-                product.getIsSale()));
+        return productEntities.map(productMapper::toDto);
     }
 
 
 
 
 
-    public StandardResponse<ProductForFront> getById(UUID id){
+    public StandardResponse<ProductForFrontDto> getById(UUID id){
         ProductEntity productEntity = productRepository.findProductEntityById(id);
         if (productEntity==null){
             throw new DataNotFoundException("Product not found!");
         }
-        ProductForFront product = modelMapper.map(productEntity, ProductForFront.class);
-        return StandardResponse.<ProductForFront>builder()
-                .data(product)
-                .status(Status.SUCCESS)
-                .message("this is product")
-                .build();
+        ProductForFrontDto product = modelMapper.map(productEntity, ProductForFrontDto.class);
+        return StandardResponse.ok("This is product",product);
     }
 
 
 
 
 
-    public StandardResponse<ProductForFront> update(UUID id, ProductDto productDto, Principal principal){
+    public StandardResponse<ProductForFrontDto> update(UUID id, ProductDto productDto, Principal principal){
         ProductEntity productEntity = productRepository.findProductEntityById(id);
         if (productEntity==null){
             throw new DataNotFoundException("product not found!");
@@ -276,13 +220,9 @@ public class ProductService {
         productEntity.setUpdatedTime(LocalDateTime.now());
         productEntity.setUpdatedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         ProductEntity save = productRepository.save(productEntity);
-        ProductForFront productForFront = modelMapper.map(save, ProductForFront.class);
+        ProductForFrontDto productForFrontDto = modelMapper.map(save, ProductForFrontDto.class);
 
-        return StandardResponse.<ProductForFront>builder()
-                .data(productForFront)
-                .status(Status.SUCCESS)
-                .message("Product updated")
-                .build();
+        return StandardResponse.ok("Product updated!",productForFrontDto);
     }
 
 
@@ -290,27 +230,18 @@ public class ProductService {
 
 
 
-    public Page<ProductForFront> getProductsInSale(Pageable pageable){
+    public Page<ProductForFrontDto> getProductsInSale(Pageable pageable){
        Page<ProductEntity> productEntities = productRepository.getAllProductsInSale(pageable);
        if (productEntities==null){
            throw new DataNotFoundException("Products not found in sale❌");
        }
-        return productEntities.map(product -> new ProductForFront(product.getId(), product.getName(),
-                product.getDescription(), product.getPrice(),
-                product.getStock(), product.getBrand(),
-                product.getModel(), product.getCategoryId(),
-                product.getWeight(), product.getDimensions(),
-                product.getColor(), product.getMaterial(),
-                product.getWarranty(), product.getSku(),
-                product.getBarcode(), product.getManufacturer(),
-                product.getCountryOfOrigin(),
-                product.getIsSale()));
+        return productEntities.map(productMapper::toDto);
     }
 
 
 
 
-    public StandardResponse<ProductForFront> setSaleToProduct(UUID id, Integer sale,Principal principal){
+    public StandardResponse<ProductForFrontDto> setSaleToProduct(UUID id, Integer sale, Principal principal){
         ProductEntity productEntity = productRepository.findProductEntityById(id);
         if (productEntity==null){
             throw new DataNotFoundException("Product not found!");
@@ -320,19 +251,15 @@ public class ProductService {
         productEntity.setUpdatedTime(LocalDateTime.now());
         productEntity.setUpdatedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         ProductEntity save = productRepository.save(productEntity);
-        ProductForFront productForFront = modelMapper.map(save, ProductForFront.class);
+        ProductForFrontDto productForFrontDto = modelMapper.map(save, ProductForFrontDto.class);
 
-        return StandardResponse.<ProductForFront>builder()
-                .status(Status.SUCCESS)
-                .data(productForFront)
-                .message("Sale added in this product!")
-                .build();
+        return StandardResponse.ok("Sale added in this product!",productForFrontDto);
 
     }
 
 
 
-    public StandardResponse<ProductForFront> removeSale(UUID id,Principal principal){
+    public StandardResponse<ProductForFrontDto> removeSale(UUID id, Principal principal){
         UserEntity user = userRepository.findUserEntityByEmail(principal.getName());
         ProductEntity productEntity = productRepository.findProductEntityById(id);
         if (productEntity==null){
@@ -343,13 +270,9 @@ public class ProductService {
         productEntity.setUpdatedTime(LocalDateTime.now());
         productEntity.setUpdatedBy(user.getId());
         ProductEntity save = productRepository.save(productEntity);
-        ProductForFront productForFront = modelMapper.map(save, ProductForFront.class);
+        ProductForFrontDto productForFrontDto = modelMapper.map(save, ProductForFrontDto.class);
 
-        return StandardResponse.<ProductForFront>builder()
-                .status(Status.SUCCESS)
-                .data(productForFront)
-                .message("Sale removed from product!")
-                .build();
+        return StandardResponse.ok("Sale removed from product!",productForFrontDto);
     }
 
 
@@ -371,10 +294,6 @@ public class ProductService {
             productRepository.save(product);
         }
 
-        return StandardResponse.<String>builder()
-                .status(Status.SUCCESS)
-                .message("Products deleted!")
-                .data("DELETED")
-                .build();
+        return StandardResponse.ok("Products has deleted successfully!","DELETED");
     }
 }

@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.com.onlineshop.model.dto.request.PaymentDto;
-import uz.com.onlineshop.model.dto.response.PaymentForFront;
-import uz.com.onlineshop.response.StandardResponse;
+import uz.com.onlineshop.model.dto.response.PaymentForFrontDto;
+import uz.com.onlineshop.standard.StandardResponse;
 import uz.com.onlineshop.service.PaymentService;
 
 import java.security.Principal;
@@ -20,7 +20,7 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PutMapping("/pay-for-order")
-    public StandardResponse<PaymentForFront> payForOrder(
+    public StandardResponse<PaymentForFrontDto> payForOrder(
             @RequestBody PaymentDto paymentDto,
             Principal principal
             ){
@@ -30,7 +30,7 @@ public class PaymentController {
 
 
     @GetMapping("/get-by-id/{id}")
-    public StandardResponse<PaymentForFront> getById(
+    public StandardResponse<PaymentForFrontDto> getById(
             @PathVariable UUID id
             ){
         return paymentService.getById(id);

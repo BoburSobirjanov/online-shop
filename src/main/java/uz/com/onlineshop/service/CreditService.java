@@ -7,18 +7,18 @@ import uz.com.onlineshop.exception.DataNotFoundException;
 import uz.com.onlineshop.exception.NotAcceptableException;
 import uz.com.onlineshop.exception.UserBadRequestException;
 import uz.com.onlineshop.model.dto.request.CreditDto;
-import uz.com.onlineshop.model.dto.response.CreditForFront;
+import uz.com.onlineshop.model.dto.response.CreditForFrontDto;
 import uz.com.onlineshop.model.entity.card.CardEntity;
 import uz.com.onlineshop.model.entity.credit.Credit;
-import uz.com.onlineshop.model.entity.credit.CreditStatus;
+import uz.com.onlineshop.model.enums.CreditStatus;
 import uz.com.onlineshop.model.entity.order.OrderEntity;
-import uz.com.onlineshop.model.entity.order.OrderStatus;
+import uz.com.onlineshop.model.enums.OrderStatus;
 import uz.com.onlineshop.repository.CardRepository;
 import uz.com.onlineshop.repository.CreditRepository;
 import uz.com.onlineshop.repository.OrderRepository;
 import uz.com.onlineshop.repository.UserRepository;
-import uz.com.onlineshop.response.StandardResponse;
-import uz.com.onlineshop.response.Status;
+import uz.com.onlineshop.standard.StandardResponse;
+import uz.com.onlineshop.standard.Status;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -37,7 +37,7 @@ public class CreditService {
 
 
 
-    public StandardResponse<CreditForFront> save(CreditDto creditDto, Principal principal){
+    public StandardResponse<CreditForFrontDto> save(CreditDto creditDto, Principal principal){
         OrderEntity order = orderRepository.findOrderEntityById(UUID.fromString(creditDto.getOrder()));
         if (order.getOrderStatus()== OrderStatus.PAID || order.getOrderStatus()==OrderStatus.CANCELLED){
             throw new UserBadRequestException("Can not create credit for this order. Because order has already paid or canceled!");
@@ -59,12 +59,12 @@ public class CreditService {
         orderRepository.save(order);
         Credit save = creditRepository.save(credit);
 
-        CreditForFront creditForFront = modelMapper.map(save, CreditForFront.class);
+        CreditForFrontDto creditForFrontDto = modelMapper.map(save, CreditForFrontDto.class);
 
-        return StandardResponse.<CreditForFront>builder()
+        return StandardResponse.<CreditForFrontDto>builder()
                 .status(Status.SUCCESS)
                 .message("Credit created!")
-                .data(creditForFront)
+                .data(creditForFrontDto)
                 .build();
     }
 
@@ -72,17 +72,17 @@ public class CreditService {
 
 
 
-    public StandardResponse<CreditForFront> getById(UUID id){
+    public StandardResponse<CreditForFrontDto> getById(UUID id){
         Optional<Credit> credit = creditRepository.findCreditById(id);
         if (credit.isEmpty()){
             throw new DataNotFoundException("Credit not found!");
         }
-        CreditForFront creditForFront = modelMapper.map(credit, CreditForFront.class);
+        CreditForFrontDto creditForFrontDto = modelMapper.map(credit, CreditForFrontDto.class);
 
-        return StandardResponse.<CreditForFront>builder()
+        return StandardResponse.<CreditForFrontDto>builder()
                 .status(Status.SUCCESS)
                 .message("This is credit!")
-                .data(creditForFront)
+                .data(creditForFrontDto)
                 .build();
     }
 
@@ -112,7 +112,7 @@ public class CreditService {
 
 
 
-    public StandardResponse<CreditForFront> payForCredit(UUID id,Double amount,String cardId){
+    public StandardResponse<CreditForFrontDto> payForCredit(UUID id, Double amount, String cardId){
         Optional<Credit> credit = creditRepository.findCreditById(id);
         if (credit.isEmpty()){
             throw new DataNotFoundException("Credit not found!");
@@ -138,12 +138,12 @@ public class CreditService {
             save.setCreditStatus(CreditStatus.COMPLETED);
             creditRepository.save(save);
         }
-        CreditForFront creditForFront = modelMapper.map(save, CreditForFront.class);
+        CreditForFrontDto creditForFrontDto = modelMapper.map(save, CreditForFrontDto.class);
 
-        return StandardResponse.<CreditForFront>builder()
+        return StandardResponse.<CreditForFrontDto>builder()
                 .status(Status.SUCCESS)
                 .message(amount + " UZS paid for credit!")
-                .data(creditForFront)
+                .data(creditForFrontDto)
                 .build();
     }
 }

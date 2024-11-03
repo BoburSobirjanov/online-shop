@@ -1,4 +1,4 @@
-package uz.com.onlineshop.response;
+package uz.com.onlineshop.standard;
 
 import lombok.Getter;
 

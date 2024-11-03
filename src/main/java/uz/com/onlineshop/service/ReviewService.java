@@ -7,15 +7,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.com.onlineshop.exception.DataNotFoundException;
 import uz.com.onlineshop.model.dto.request.ReviewDto;
-import uz.com.onlineshop.model.dto.response.ProductForFront;
-import uz.com.onlineshop.model.dto.response.ReviewForFront;
-import uz.com.onlineshop.model.dto.response.UserForFront;
+import uz.com.onlineshop.model.dto.response.ProductForFrontDto;
+import uz.com.onlineshop.model.dto.response.ReviewForFrontDto;
+import uz.com.onlineshop.model.dto.response.UserForFrontDto;
 import uz.com.onlineshop.model.entity.review.ReviewsEntity;
 import uz.com.onlineshop.repository.ProductRepository;
 import uz.com.onlineshop.repository.ReviewRepository;
 import uz.com.onlineshop.repository.UserRepository;
-import uz.com.onlineshop.response.StandardResponse;
-import uz.com.onlineshop.response.Status;
+import uz.com.onlineshop.standard.StandardResponse;
+import uz.com.onlineshop.standard.Status;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -33,16 +33,16 @@ public class ReviewService {
 
 
 
-    public StandardResponse<ReviewForFront> save(ReviewDto reviewDto, Principal principal){
+    public StandardResponse<ReviewForFrontDto> save(ReviewDto reviewDto, Principal principal){
         ReviewsEntity reviewsEntity = modelMapper.map(reviewDto, ReviewsEntity.class);
         reviewsEntity.setComment(reviewDto.getComment());
         reviewsEntity.setRating(reviewDto.getRating());
         reviewsEntity.setUserId(userRepository.findUserEntityByEmail(principal.getName()));
         reviewsEntity.setProductId(productRepository.findProductEntityById(UUID.fromString(reviewDto.getProductId())));
         ReviewsEntity save = reviewRepository.save(reviewsEntity);
-        ReviewForFront review = modelMapper.map(save, ReviewForFront.class);
+        ReviewForFrontDto review = modelMapper.map(save, ReviewForFrontDto.class);
 
-        return StandardResponse.<ReviewForFront>builder()
+        return StandardResponse.<ReviewForFrontDto>builder()
                 .data(review)
                 .status(Status.SUCCESS)
                 .message("Review saved!")
@@ -81,10 +81,10 @@ public class ReviewService {
 
 
 
-    public Page<ReviewForFront> getAllRatingByAsc(Pageable pageable){
+    public Page<ReviewForFrontDto> getAllRatingByAsc(Pageable pageable){
         Page<ReviewsEntity> reviewsEntities = reviewRepository.findAllReviewsByRatingAsc(pageable);
-        return reviewsEntities.map(reviewsEntity -> new ReviewForFront(modelMapper.map(reviewsEntity.getProductId(), ProductForFront.class),
-                modelMapper.map(reviewsEntity.getUserId(), UserForFront.class),
+        return reviewsEntities.map(reviewsEntity -> new ReviewForFrontDto(modelMapper.map(reviewsEntity.getProductId(), ProductForFrontDto.class),
+                modelMapper.map(reviewsEntity.getUserId(), UserForFrontDto.class),
                 reviewsEntity.getRating(), reviewsEntity.getComment()));
 
     }
@@ -96,10 +96,10 @@ public class ReviewService {
 
 
 
-    public Page<ReviewForFront> getAllRatingByDesc(Pageable pageable){
+    public Page<ReviewForFrontDto> getAllRatingByDesc(Pageable pageable){
         Page<ReviewsEntity> reviewsEntities = reviewRepository.findAllReviewsByRatingDesc(pageable);
-        return reviewsEntities.map(reviewsEntity -> new ReviewForFront(modelMapper.map(reviewsEntity.getProductId(), ProductForFront.class),
-                modelMapper.map(reviewsEntity.getUserId(), UserForFront.class),
+        return reviewsEntities.map(reviewsEntity -> new ReviewForFrontDto(modelMapper.map(reviewsEntity.getProductId(), ProductForFrontDto.class),
+                modelMapper.map(reviewsEntity.getUserId(), UserForFrontDto.class),
                 reviewsEntity.getRating(), reviewsEntity.getComment()));
 
     }
@@ -110,10 +110,10 @@ public class ReviewService {
 
 
 
-    public Page<ReviewForFront> getAllReviews(Pageable pageable){
+    public Page<ReviewForFrontDto> getAllReviews(Pageable pageable){
         Page<ReviewsEntity> reviewsEntities = reviewRepository.findAllReviews(pageable);
-        return reviewsEntities.map(reviewsEntity -> new ReviewForFront(modelMapper.map(reviewsEntity.getProductId(), ProductForFront.class),
-                modelMapper.map(reviewsEntity.getUserId(), UserForFront.class),
+        return reviewsEntities.map(reviewsEntity -> new ReviewForFrontDto(modelMapper.map(reviewsEntity.getProductId(), ProductForFrontDto.class),
+                modelMapper.map(reviewsEntity.getUserId(), UserForFrontDto.class),
                 reviewsEntity.getRating(), reviewsEntity.getComment()));
     }
 
@@ -122,10 +122,10 @@ public class ReviewService {
 
 
 
-    public Page<ReviewForFront> findReviewsByUserId(Pageable pageable, UUID id){
+    public Page<ReviewForFrontDto> findReviewsByUserId(Pageable pageable, UUID id){
         Page<ReviewsEntity> reviewsEntities = reviewRepository.findReviewsEntityByUserId(pageable,id);
-        return reviewsEntities.map(reviewsEntity -> new ReviewForFront(modelMapper.map(reviewsEntity.getProductId(), ProductForFront.class),
-                modelMapper.map(reviewsEntity.getUserId(), UserForFront.class),
+        return reviewsEntities.map(reviewsEntity -> new ReviewForFrontDto(modelMapper.map(reviewsEntity.getProductId(), ProductForFrontDto.class),
+                modelMapper.map(reviewsEntity.getUserId(), UserForFrontDto.class),
                 reviewsEntity.getRating(), reviewsEntity.getComment()));
     }
 }

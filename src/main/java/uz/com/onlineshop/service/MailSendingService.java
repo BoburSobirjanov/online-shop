@@ -10,8 +10,8 @@ import uz.com.onlineshop.model.entity.user.UserEntity;
 import uz.com.onlineshop.model.entity.verification.VerificationEntity;
 import uz.com.onlineshop.repository.UserRepository;
 import uz.com.onlineshop.repository.VerificationRepository;
-import uz.com.onlineshop.response.StandardResponse;
-import uz.com.onlineshop.response.Status;
+import uz.com.onlineshop.standard.StandardResponse;
+import uz.com.onlineshop.standard.Status;
 
 import java.util.Random;
 

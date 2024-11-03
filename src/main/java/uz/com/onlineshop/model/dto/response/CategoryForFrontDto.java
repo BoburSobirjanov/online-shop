@@ -2,7 +2,6 @@ package uz.com.onlineshop.model.dto.response;
 
 import lombok.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -10,9 +9,11 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-public class BasketForFront {
+public class CategoryForFrontDto {
 
     private UUID id;
 
-    private List<ProductForFront> productEntities;
+    private String name;
+
+    private String description;
 }

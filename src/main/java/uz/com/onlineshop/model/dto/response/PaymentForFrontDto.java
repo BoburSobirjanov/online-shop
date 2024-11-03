@@ -1,7 +1,7 @@
 package uz.com.onlineshop.model.dto.response;
 
 import lombok.*;
-import uz.com.onlineshop.model.entity.payment.PaymentMethod;
+import uz.com.onlineshop.model.enums.PaymentMethod;
 
 import java.util.UUID;
 
@@ -10,13 +10,13 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-public class PaymentForFront {
+public class PaymentForFrontDto {
 
     private UUID id;
 
-    private OrderForFront order;
+    private OrderForFrontDto order;
 
-    private UserForFront user;
+    private UserForFrontDto user;
 
     private PaymentMethod paymentMethod;
 

@@ -11,8 +11,8 @@ import uz.com.onlineshop.exception.RequestValidationException;
 import uz.com.onlineshop.filter.IpAddressUtil;
 import uz.com.onlineshop.model.dto.request.user.LoginDto;
 import uz.com.onlineshop.model.dto.request.user.UserDto;
-import uz.com.onlineshop.response.JwtResponse;
-import uz.com.onlineshop.response.StandardResponse;
+import uz.com.onlineshop.standard.JwtResponse;
+import uz.com.onlineshop.standard.StandardResponse;
 import uz.com.onlineshop.service.MailSendingService;
 import uz.com.onlineshop.service.UserService;
 

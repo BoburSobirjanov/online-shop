@@ -7,15 +7,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.com.onlineshop.exception.DataNotFoundException;
 import uz.com.onlineshop.exception.NotAcceptableException;
+import uz.com.onlineshop.mapper.CategoryMapper;
 import uz.com.onlineshop.model.dto.request.CategoryDto;
-import uz.com.onlineshop.model.dto.response.CategoryForFront;
+import uz.com.onlineshop.model.dto.response.CategoryForFrontDto;
 import uz.com.onlineshop.model.entity.categories.Category;
 import uz.com.onlineshop.model.entity.product.ProductEntity;
 import uz.com.onlineshop.repository.CategoryRepository;
 import uz.com.onlineshop.repository.ProductRepository;
 import uz.com.onlineshop.repository.UserRepository;
-import uz.com.onlineshop.response.StandardResponse;
-import uz.com.onlineshop.response.Status;
+import uz.com.onlineshop.standard.StandardResponse;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -31,24 +31,21 @@ public class CategoryService {
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final CategoryMapper categoryMapper;
 
 
 
 
 
 
-    public StandardResponse<CategoryForFront> save(CategoryDto categoryDto){
+    public StandardResponse<CategoryForFrontDto> save(CategoryDto categoryDto){
         checkHasCategory(categoryDto.getName());
         Category category =  modelMapper.map(categoryDto, Category.class);
         category.setDescription(categoryDto.getDescription());
         category.setName(categoryDto.getName());
         categoryRepository.save(category);
-        CategoryForFront categoryForFront = modelMapper.map(category, CategoryForFront.class);
-        return StandardResponse.<CategoryForFront>builder()
-                .data(categoryForFront)
-                .status(Status.SUCCESS)
-                .message("Category added successfully!")
-                .build();
+        CategoryForFrontDto categoryForFrontDto = modelMapper.map(category, CategoryForFrontDto.class);
+        return StandardResponse.ok("Category added successfully!",categoryForFrontDto);
     }
 
 
@@ -87,11 +84,7 @@ public class CategoryService {
         category.setDeletedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         categoryRepository.save(category);
 
-        return StandardResponse.<String>builder()
-                .data("DELETED")
-                .status(Status.SUCCESS)
-                .message("Category deleted")
-                .build();
+        return StandardResponse.ok("Category deleted","DELETED");
     }
 
 
@@ -101,17 +94,13 @@ public class CategoryService {
 
 
 
-    public StandardResponse<CategoryForFront> getById(UUID id){
+    public StandardResponse<CategoryForFrontDto> getById(UUID id){
         Category category = categoryRepository.findCategoryById(id);
         if (category==null){
             throw new DataNotFoundException("Category not found!");
         }
-        CategoryForFront categoryForFront = modelMapper.map(category, CategoryForFront.class);
-        return StandardResponse.<CategoryForFront>builder()
-                .data(categoryForFront)
-                .status(Status.SUCCESS)
-                .message("This is category!")
-                .build();
+        CategoryForFrontDto categoryForFrontDto = modelMapper.map(category, CategoryForFrontDto.class);
+        return StandardResponse.ok("This is category!",categoryForFrontDto);
     }
 
 
@@ -120,15 +109,15 @@ public class CategoryService {
 
 
 
-    public Page<CategoryForFront> getAllCategories(Pageable pageable){
+    public Page<CategoryForFrontDto> getAllCategories(Pageable pageable){
         Page<Category> categories = categoryRepository.findAllCategories(pageable);
-        return categories.map(category -> new CategoryForFront(category.getId(), category.getName(), category.getDescription()));
+        return categories.map(categoryMapper::toDto);
     }
 
 
 
 
-    public StandardResponse<CategoryForFront> update(UUID id, CategoryDto categoryDto, Principal principal){
+    public StandardResponse<CategoryForFrontDto> update(UUID id, CategoryDto categoryDto, Principal principal){
         Category category = categoryRepository.findCategoryById(id);
         if (category==null){
             throw new DataNotFoundException("Category not found!");
@@ -138,13 +127,9 @@ public class CategoryService {
         category.setUpdatedTime(LocalDateTime.now());
         category.setUpdatedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         Category save = categoryRepository.save(category);
-        CategoryForFront categoryForFront = modelMapper.map(save, CategoryForFront.class);
+        CategoryForFrontDto categoryForFrontDto = modelMapper.map(save, CategoryForFrontDto.class);
 
-        return StandardResponse.<CategoryForFront>builder()
-                .data(categoryForFront)
-                .status(Status.SUCCESS)
-                .message("Category updated!")
-                .build();
+        return StandardResponse.ok("Category updated!",categoryForFrontDto);
     }
 
 
@@ -167,10 +152,6 @@ public class CategoryService {
             categoryRepository.save(category);
         }
 
-        return StandardResponse.<String>builder()
-                .status(Status.SUCCESS)
-                .message("Categories deleted!")
-                .data("DELETED")
-                .build();
+        return StandardResponse.ok("Categories deleted","DELETED");
     }
 }

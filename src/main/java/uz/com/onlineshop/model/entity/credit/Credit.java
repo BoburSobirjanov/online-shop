@@ -5,6 +5,7 @@ import lombok.*;
 import uz.com.onlineshop.model.entity.BaseEntity;
 import uz.com.onlineshop.model.entity.order.OrderEntity;
 import uz.com.onlineshop.model.entity.user.UserEntity;
+import uz.com.onlineshop.model.enums.CreditStatus;
 
 import java.time.LocalDateTime;
 

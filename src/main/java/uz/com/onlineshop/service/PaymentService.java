@@ -6,20 +6,20 @@ import org.springframework.stereotype.Service;
 import uz.com.onlineshop.exception.DataNotFoundException;
 import uz.com.onlineshop.exception.UserBadRequestException;
 import uz.com.onlineshop.model.dto.request.PaymentDto;
-import uz.com.onlineshop.model.dto.response.PaymentForFront;
+import uz.com.onlineshop.model.dto.response.PaymentForFrontDto;
 import uz.com.onlineshop.model.entity.card.CardEntity;
 import uz.com.onlineshop.model.entity.order.OrderEntity;
-import uz.com.onlineshop.model.entity.order.OrderStatus;
+import uz.com.onlineshop.model.enums.OrderStatus;
 import uz.com.onlineshop.model.entity.payment.Payment;
-import uz.com.onlineshop.model.entity.payment.PaymentMethod;
-import uz.com.onlineshop.model.entity.payment.PaymentStatus;
+import uz.com.onlineshop.model.enums.PaymentMethod;
+import uz.com.onlineshop.model.enums.PaymentStatus;
 import uz.com.onlineshop.model.entity.user.UserEntity;
 import uz.com.onlineshop.repository.CardRepository;
 import uz.com.onlineshop.repository.OrderRepository;
 import uz.com.onlineshop.repository.PaymentRepository;
 import uz.com.onlineshop.repository.UserRepository;
-import uz.com.onlineshop.response.StandardResponse;
-import uz.com.onlineshop.response.Status;
+import uz.com.onlineshop.standard.StandardResponse;
+import uz.com.onlineshop.standard.Status;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -39,7 +39,7 @@ public class PaymentService {
 
 
 
-    public StandardResponse<PaymentForFront> payForOrder(PaymentDto paymentDto, Principal principal){
+    public StandardResponse<PaymentForFrontDto> payForOrder(PaymentDto paymentDto, Principal principal){
         Payment payment = modelMapper.map(paymentDto, Payment.class);
         UserEntity user = userRepository.findUserEntityByEmail(principal.getName());
         OrderEntity order = orderRepository.findOrderEntityById(UUID.fromString(paymentDto.getOrderId()));
@@ -71,28 +71,28 @@ public class PaymentService {
         order.setOrderStatus(OrderStatus.PAID);
         orderRepository.save(order);
         Payment save = paymentRepository.save(payment);
-        PaymentForFront paymentForFront = modelMapper.map(save, PaymentForFront.class);
+        PaymentForFrontDto paymentForFrontDto = modelMapper.map(save, PaymentForFrontDto.class);
 
-        return StandardResponse.<PaymentForFront>builder()
+        return StandardResponse.<PaymentForFrontDto>builder()
                 .status(Status.SUCCESS)
                 .message("Payment added")
-                .data(paymentForFront)
+                .data(paymentForFrontDto)
                 .build();
     }
 
 
 
-    public StandardResponse<PaymentForFront> getById(UUID id){
+    public StandardResponse<PaymentForFrontDto> getById(UUID id){
         Payment payment = paymentRepository.findPaymentById(id);
         if (payment==null){
             throw new DataNotFoundException("Payment not found!");
         }
-        PaymentForFront paymentForFront = modelMapper.map(payment, PaymentForFront.class);
+        PaymentForFrontDto paymentForFrontDto = modelMapper.map(payment, PaymentForFrontDto.class);
 
-        return StandardResponse.<PaymentForFront>builder()
+        return StandardResponse.<PaymentForFrontDto>builder()
                 .status(Status.SUCCESS)
                 .message("This is payment")
-                .data(paymentForFront)
+                .data(paymentForFrontDto)
                 .build();
     }
 

@@ -9,14 +9,14 @@ import uz.com.onlineshop.exception.DataHasAlreadyExistException;
 import uz.com.onlineshop.exception.DataNotFoundException;
 import uz.com.onlineshop.exception.NotAcceptableException;
 import uz.com.onlineshop.model.dto.request.CardDto;
-import uz.com.onlineshop.model.dto.response.CardForFront;
+import uz.com.onlineshop.model.dto.response.CardForFrontDto;
 import uz.com.onlineshop.model.entity.card.CardEntity;
-import uz.com.onlineshop.model.entity.card.CardType;
+import uz.com.onlineshop.model.enums.CardType;
 import uz.com.onlineshop.model.entity.user.UserEntity;
 import uz.com.onlineshop.repository.CardRepository;
 import uz.com.onlineshop.repository.UserRepository;
-import uz.com.onlineshop.response.StandardResponse;
-import uz.com.onlineshop.response.Status;
+import uz.com.onlineshop.standard.StandardResponse;
+import uz.com.onlineshop.standard.Status;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -31,7 +31,7 @@ public class CardService {
     private final ModelMapper modelMapper;
 
 
-    public StandardResponse<CardForFront> save(CardDto cardDto, Principal principal){
+    public StandardResponse<CardForFrontDto> save(CardDto cardDto, Principal principal){
         checkHasCard(cardDto.getCardNumber());
         CardEntity card = modelMapper.map(cardDto, CardEntity.class);
         if (cardDto.getCardNumber()!=null && cardDto.getCardNumber().length()>16){
@@ -50,9 +50,9 @@ public class CardService {
         }
         card.setUserId(userRepository.findUserEntityByEmail(principal.getName()));
         CardEntity save = cardRepository.save(card);
-        CardForFront cardForFront = modelMapper.map(save, CardForFront.class);
-        return StandardResponse.<CardForFront>builder()
-                .data(cardForFront)
+        CardForFrontDto cardForFrontDto = modelMapper.map(save, CardForFrontDto.class);
+        return StandardResponse.<CardForFrontDto>builder()
+                .data(cardForFrontDto)
                 .status(Status.SUCCESS)
                 .message("Card added!")
                 .build();
@@ -102,9 +102,9 @@ public class CardService {
 
 
 
-    public Page<CardForFront> getCardsByType(Pageable pageable, String type){
+    public Page<CardForFrontDto> getCardsByType(Pageable pageable, String type){
         Page<CardEntity> cardEntities = cardRepository.findCardEntityByCardType(pageable, type);
-        return cardEntities.map(cardEntity -> new CardForFront(cardEntity.getId(), cardEntity.getCardNumber(),
+        return cardEntities.map(cardEntity -> new CardForFrontDto(cardEntity.getId(), cardEntity.getCardNumber(),
                 cardEntity.getCardType(), cardEntity.getExpireDate()));
     }
 
@@ -113,9 +113,9 @@ public class CardService {
 
 
 
-    public Page<CardForFront> getAllCards(Pageable pageable){
+    public Page<CardForFrontDto> getAllCards(Pageable pageable){
         Page<CardEntity> cardEntities = cardRepository.findAllCards(pageable);
-        return cardEntities.map(cardEntity -> new CardForFront(cardEntity.getId(), cardEntity.getCardNumber(),
+        return cardEntities.map(cardEntity -> new CardForFrontDto(cardEntity.getId(), cardEntity.getCardNumber(),
                 cardEntity.getCardType(), cardEntity.getExpireDate()));
     }
 
@@ -124,14 +124,14 @@ public class CardService {
 
 
 
-    public StandardResponse<CardForFront> getById(UUID id){
+    public StandardResponse<CardForFrontDto> getById(UUID id){
         CardEntity card = cardRepository.findCardEntityById(id);
         if (card==null){
             throw new DataNotFoundException("Card not found!");
         }
-        CardForFront cardForFront = modelMapper.map(card, CardForFront.class);
-        return StandardResponse.<CardForFront>builder()
-                .data(cardForFront)
+        CardForFrontDto cardForFrontDto = modelMapper.map(card, CardForFrontDto.class);
+        return StandardResponse.<CardForFrontDto>builder()
+                .data(cardForFrontDto)
                 .status(Status.SUCCESS)
                 .message("This is card")
                 .build();
@@ -159,11 +159,11 @@ public class CardService {
 
 
 
-    public Page<CardForFront> getMyCards(Pageable pageable,Principal principal){
+    public Page<CardForFrontDto> getMyCards(Pageable pageable, Principal principal){
         UserEntity user = userRepository.findUserEntityByEmail(principal.getName());
         Page<CardEntity> cards = cardRepository.findAllByUserId(pageable,user);
 
-        return cards.map(cardEntity -> new CardForFront(cardEntity.getId(), cardEntity.getCardNumber(),
+        return cards.map(cardEntity -> new CardForFrontDto(cardEntity.getId(), cardEntity.getCardNumber(),
                 cardEntity.getCardType(), cardEntity.getExpireDate()));
     }
 

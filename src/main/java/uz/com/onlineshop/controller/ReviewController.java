@@ -12,8 +12,8 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import uz.com.onlineshop.exception.RequestValidationException;
 import uz.com.onlineshop.model.dto.request.ReviewDto;
-import uz.com.onlineshop.model.dto.response.ReviewForFront;
-import uz.com.onlineshop.response.StandardResponse;
+import uz.com.onlineshop.model.dto.response.ReviewForFrontDto;
+import uz.com.onlineshop.standard.StandardResponse;
 import uz.com.onlineshop.service.ReviewService;
 
 import java.security.Principal;
@@ -34,7 +34,7 @@ public class ReviewController {
 
 
     @PostMapping("/save-review")
-    public ResponseEntity<StandardResponse<ReviewForFront>> save(
+    public ResponseEntity<StandardResponse<ReviewForFrontDto>> save(
             @Valid
             @RequestBody ReviewDto reviewDto,
             Principal principal, BindingResult bindingResult
@@ -53,7 +53,7 @@ public class ReviewController {
 
     @GetMapping("/get-all-reviews-asc")
     @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
-    public Page<ReviewForFront> getAllReviewsByRatingAsc(
+    public Page<ReviewForFrontDto> getAllReviewsByRatingAsc(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ){
@@ -85,7 +85,7 @@ public class ReviewController {
 
     @GetMapping("/get-all-reviews-desc")
     @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
-    public Page<ReviewForFront> getAllReviewsByRatingDesc(
+    public Page<ReviewForFrontDto> getAllReviewsByRatingDesc(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ){
@@ -98,7 +98,7 @@ public class ReviewController {
 
 
     @GetMapping("/get-all-reviews")
-    public Page<ReviewForFront> getAllReviews(
+    public Page<ReviewForFrontDto> getAllReviews(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ){

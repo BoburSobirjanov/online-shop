@@ -5,6 +5,8 @@ import lombok.*;
 import uz.com.onlineshop.model.entity.BaseEntity;
 import uz.com.onlineshop.model.entity.order.OrderEntity;
 import uz.com.onlineshop.model.entity.user.UserEntity;
+import uz.com.onlineshop.model.enums.PaymentMethod;
+import uz.com.onlineshop.model.enums.PaymentStatus;
 
 
 @Entity(name = "payment")

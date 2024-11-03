@@ -7,11 +7,11 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class ReviewForFront {
+public class ReviewForFrontDto {
 
-    private ProductForFront productId;
+    private ProductForFrontDto productId;
 
-    private UserForFront userId;
+    private UserForFrontDto userId;
 
     private Integer rating;
 

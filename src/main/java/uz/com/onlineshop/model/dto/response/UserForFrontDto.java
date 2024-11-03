@@ -1,8 +1,8 @@
 package uz.com.onlineshop.model.dto.response;
 
 import lombok.*;
-import uz.com.onlineshop.model.entity.user.Gender;
-import uz.com.onlineshop.model.entity.user.UserRole;
+import uz.com.onlineshop.model.enums.Gender;
+import uz.com.onlineshop.model.enums.UserRole;
 
 import java.util.UUID;
 
@@ -11,7 +11,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-public class UserForFront {
+public class UserForFrontDto {
 
     private UUID id;
 

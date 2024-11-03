@@ -12,8 +12,8 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import uz.com.onlineshop.exception.RequestValidationException;
 import uz.com.onlineshop.model.dto.request.CardDto;
-import uz.com.onlineshop.model.dto.response.CardForFront;
-import uz.com.onlineshop.response.StandardResponse;
+import uz.com.onlineshop.model.dto.response.CardForFrontDto;
+import uz.com.onlineshop.standard.StandardResponse;
 import uz.com.onlineshop.service.CardService;
 
 import java.security.Principal;
@@ -32,7 +32,7 @@ public class CardController {
 
 
     @PostMapping("/save-card")
-    public ResponseEntity<StandardResponse<CardForFront>> save(
+    public ResponseEntity<StandardResponse<CardForFrontDto>> save(
             @Valid @RequestBody CardDto cardDto,
             Principal principal, BindingResult bindingResult
             ) throws RequestValidationException {
@@ -59,7 +59,7 @@ public class CardController {
 
     @GetMapping("/get-all-by-type")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
-    public Page<CardForFront> getByType(
+    public Page<CardForFrontDto> getByType(
             @RequestParam String type,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -74,7 +74,7 @@ public class CardController {
 
     @GetMapping("/get-all-cards")
     @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
-    public Page<CardForFront> getAllCards(
+    public Page<CardForFrontDto> getAllCards(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ){
@@ -87,7 +87,7 @@ public class CardController {
 
 
     @GetMapping("/get-by-id/{id}")
-    public StandardResponse<CardForFront> getById(
+    public StandardResponse<CardForFrontDto> getById(
             @PathVariable UUID id
     ){
         return cardService.getById(id);
@@ -106,7 +106,7 @@ public class CardController {
 
 
     @GetMapping("/get-my-cards")
-    public Page<CardForFront> getMyCards(
+    public Page<CardForFrontDto> getMyCards(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Principal principal

@@ -45,6 +45,6 @@ public interface UserRepository extends JpaRepository<UserEntity,UUID> {
     List<UserEntity> findAllById(List<UUID> id);
 
 
-    @Query("select u from users as u where u.isDeleted=false and u.fullName=?1")
+    @Query("select u from users as u where u.isDeleted=false and u.fullName ilike %?1%")
     Page<UserEntity> findUserEntityByFullName(String name, Pageable pageable);
 }

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import uz.com.onlineshop.model.entity.BaseEntity;
 import uz.com.onlineshop.model.entity.user.UserEntity;
+import uz.com.onlineshop.model.enums.CardType;
 
 
 @AllArgsConstructor

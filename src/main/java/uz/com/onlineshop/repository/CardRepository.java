@@ -15,7 +15,7 @@ public interface CardRepository extends JpaRepository<CardEntity, UUID> {
 
 
 
-    @Query("select c from cards as c where c.isDeleted=false and c.cardNumber=?1")
+    @Query("select c from cards as c where c.isDeleted=false and c.cardNumber ilike %?1%")
     CardEntity findCardEntityByCardNumber(String number);
 
 

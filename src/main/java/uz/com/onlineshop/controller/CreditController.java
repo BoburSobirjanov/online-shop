@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.com.onlineshop.model.dto.request.CreditDto;
-import uz.com.onlineshop.model.dto.response.CreditForFront;
-import uz.com.onlineshop.response.StandardResponse;
+import uz.com.onlineshop.model.dto.response.CreditForFrontDto;
+import uz.com.onlineshop.standard.StandardResponse;
 import uz.com.onlineshop.service.CreditService;
 
 import java.security.Principal;
@@ -20,7 +20,7 @@ public class CreditController {
 
 
     @PostMapping("/save")
-    public StandardResponse<CreditForFront> save(
+    public StandardResponse<CreditForFrontDto> save(
             @RequestBody CreditDto creditDto,
             Principal principal
             ){
@@ -31,7 +31,7 @@ public class CreditController {
 
 
     @GetMapping("get-by-id/{id}")
-    public StandardResponse<CreditForFront> getById(
+    public StandardResponse<CreditForFrontDto> getById(
             @PathVariable UUID id
             ){
         return creditService.getById(id);
@@ -53,7 +53,7 @@ public class CreditController {
 
 
     @PutMapping("/{id}/pay-for-this/")
-    public StandardResponse<CreditForFront> payForCredit(
+    public StandardResponse<CreditForFrontDto> payForCredit(
             @PathVariable UUID id,
             @RequestParam Double amount,
             @RequestParam String cardId

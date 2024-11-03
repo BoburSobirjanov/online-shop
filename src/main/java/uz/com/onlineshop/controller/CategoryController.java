@@ -12,8 +12,8 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import uz.com.onlineshop.exception.RequestValidationException;
 import uz.com.onlineshop.model.dto.request.CategoryDto;
-import uz.com.onlineshop.model.dto.response.CategoryForFront;
-import uz.com.onlineshop.response.StandardResponse;
+import uz.com.onlineshop.model.dto.response.CategoryForFrontDto;
+import uz.com.onlineshop.standard.StandardResponse;
 import uz.com.onlineshop.service.CategoryService;
 
 import java.security.Principal;
@@ -32,7 +32,7 @@ public class CategoryController {
 
     @PostMapping("/save")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
-    public ResponseEntity<StandardResponse<CategoryForFront>> save(
+    public ResponseEntity<StandardResponse<CategoryForFrontDto>> save(
             @Valid
             @RequestBody CategoryDto categoryDto,
             BindingResult bindingResult
@@ -66,7 +66,7 @@ public class CategoryController {
 
 
     @GetMapping("/get-by-id/{id}")
-    public StandardResponse<CategoryForFront> getById(
+    public StandardResponse<CategoryForFrontDto> getById(
             @PathVariable UUID id
     ){
         return categoryService.getById(id);
@@ -78,8 +78,8 @@ public class CategoryController {
 
 
     @GetMapping("/get-all-categories")
-    public Page<CategoryForFront> getCategories(@RequestParam(defaultValue = "0") int page,
-                                           @RequestParam(defaultValue = "10") int size) {
+    public Page<CategoryForFrontDto> getCategories(@RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return categoryService.getAllCategories(pageable);
     }
@@ -90,7 +90,7 @@ public class CategoryController {
 
     @PutMapping("/update-category/{id}")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
-    public StandardResponse<CategoryForFront> update(
+    public StandardResponse<CategoryForFrontDto> update(
             @PathVariable UUID id,
             @RequestBody CategoryDto categoryDto,
             Principal principal

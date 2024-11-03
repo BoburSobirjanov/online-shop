@@ -10,10 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.com.onlineshop.model.dto.request.user.UserDto;
-import uz.com.onlineshop.model.dto.response.ReviewForFront;
-import uz.com.onlineshop.model.dto.response.UserForFront;
+import uz.com.onlineshop.model.dto.response.ReviewForFrontDto;
+import uz.com.onlineshop.model.dto.response.UserForFrontDto;
 import uz.com.onlineshop.model.entity.user.UserEntity;
-import uz.com.onlineshop.response.StandardResponse;
+import uz.com.onlineshop.standard.StandardResponse;
 import uz.com.onlineshop.service.FileService;
 import uz.com.onlineshop.service.ReviewService;
 import uz.com.onlineshop.service.UserService;
@@ -38,7 +38,7 @@ public class UserController {
 
 
     @GetMapping("/get-user-by-id/{id}")
-    public StandardResponse<UserForFront> getById(
+    public StandardResponse<UserForFrontDto> getById(
             @PathVariable UUID id
             ){
         return userService.getById(id);
@@ -76,7 +76,7 @@ public class UserController {
 
     @PutMapping("/{id}/assign-to-admin")
     @PreAuthorize("hasRole('OWNER')")
-    public StandardResponse<UserForFront> assignToAdmin(
+    public StandardResponse<UserForFrontDto> assignToAdmin(
             @PathVariable UUID id,
             Principal principal
     ){
@@ -88,7 +88,7 @@ public class UserController {
 
 
     @PutMapping("/update-profile/{id}")
-    public StandardResponse<UserForFront> updateProfile(
+    public StandardResponse<UserForFrontDto> updateProfile(
             @PathVariable UUID id,
             Principal principal,
             @RequestBody UserDto userDto
@@ -102,8 +102,8 @@ public class UserController {
 
     @GetMapping("/get-all-users")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
-    public Page<UserForFront> getUsers(@RequestParam(defaultValue = "0") int page,
-                                     @RequestParam(defaultValue = "10") int size) {
+    public Page<UserForFrontDto> getUsers(@RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return userService.getAll(pageable);
     }
@@ -141,7 +141,7 @@ public class UserController {
 
     @PutMapping("/get-all-user-by-status")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
-    public Page<UserForFront> getUsersByStatus(
+    public Page<UserForFrontDto> getUsersByStatus(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam String status
@@ -157,7 +157,7 @@ public class UserController {
 
     @GetMapping("/{id}/get-user-reviews")
     @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
-    public Page<ReviewForFront> getUsersReviews(
+    public Page<ReviewForFrontDto> getUsersReviews(
             @PathVariable UUID id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -228,7 +228,7 @@ public class UserController {
 
     @GetMapping("/search-by-number")
     @PreAuthorize("hasRole('ADMIN')")
-    public StandardResponse<UserForFront> searchByNumber(
+    public StandardResponse<UserForFrontDto> searchByNumber(
             @RequestParam String number
     ){
         return userService.searchUserByNumber(number);
@@ -238,7 +238,7 @@ public class UserController {
 
     @GetMapping("/search-by-name")
     @PreAuthorize("hasRole('ADMIN')")
-    public Page<UserForFront> searchByName(
+    public Page<UserForFrontDto> searchByName(
             @RequestParam String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uz.com.onlineshop.exception.DataNotFoundException;
 import uz.com.onlineshop.exception.NotAcceptableException;
 import uz.com.onlineshop.exception.UserBadRequestException;
+import uz.com.onlineshop.mapper.OrderMapper;
 import uz.com.onlineshop.model.dto.request.OrderDto;
 import uz.com.onlineshop.model.dto.response.OrderForFrontDto;
 import uz.com.onlineshop.model.entity.basket.Basket;
@@ -20,7 +21,6 @@ import uz.com.onlineshop.repository.CreditRepository;
 import uz.com.onlineshop.repository.OrderRepository;
 import uz.com.onlineshop.repository.UserRepository;
 import uz.com.onlineshop.standard.StandardResponse;
-import uz.com.onlineshop.standard.Status;
 
 import java.security.Principal;
 import java.time.Duration;
@@ -40,6 +40,7 @@ public class OrderService {
     private final ModelMapper modelMapper;
     private final BasketRepository basketRepository;
     private final CreditRepository creditRepository;
+    private final OrderMapper orderMapper;
 
 
 
@@ -61,11 +62,7 @@ public class OrderService {
         basketRepository.delete(basket.get());
         OrderForFrontDto orderForFrontDto = modelMapper.map(save, OrderForFrontDto.class);
 
-        return StandardResponse.<OrderForFrontDto>builder()
-                .data(orderForFrontDto)
-                .status(Status.SUCCESS)
-                .message("Order saved!")
-                .build();
+        return StandardResponse.ok("Order saved!",orderForFrontDto);
     }
 
 
@@ -76,11 +73,7 @@ public class OrderService {
             throw new DataNotFoundException("Order not found!");
         }
         OrderForFrontDto orderForFrontDto = modelMapper.map(order, OrderForFrontDto.class);
-        return StandardResponse.<OrderForFrontDto>builder()
-                .data(orderForFrontDto)
-                .status(Status.SUCCESS)
-                .message("This is order!")
-                .build();
+        return StandardResponse.ok("This is order",orderForFrontDto);
     }
 
 
@@ -100,11 +93,7 @@ public class OrderService {
                 order.setDeletedTime(LocalDateTime.now());
                 orderRepository.save(order);
 
-                return StandardResponse.<String>builder()
-                        .data("DELETED")
-                        .status(Status.SUCCESS)
-                        .message("Order deleted!")
-                        .build();
+                return StandardResponse.ok("Order deleted!","DELETED");
             }
             if (creditByOrder.get().getCreditAmount()>0){
                 throw new NotAcceptableException("Can not delete this order. There is a credit associated with this order. Please, pay for credit firstly!");
@@ -115,11 +104,7 @@ public class OrderService {
         order.setDeletedTime(LocalDateTime.now());
         orderRepository.save(order);
 
-        return StandardResponse.<String>builder()
-                .data("DELETED")
-                .status(Status.SUCCESS)
-                .message("Order deleted!")
-                .build();
+        return StandardResponse.ok("Order deleted!","DELETED");
 
     }
 
@@ -140,11 +125,7 @@ public class OrderService {
         OrderEntity save = orderRepository.save(order);
         OrderForFrontDto orderForFrontDto = modelMapper.map(save, OrderForFrontDto.class);
 
-        return StandardResponse.<OrderForFrontDto>builder()
-                .data(orderForFrontDto)
-                .status(Status.SUCCESS)
-                .message("Order cancelled!")
-                .build();
+        return StandardResponse.ok("Order canceled!",orderForFrontDto);
     }
 
 
@@ -164,28 +145,21 @@ public class OrderService {
         OrderEntity save = orderRepository.save(order);
         OrderForFrontDto orderForFrontDto = modelMapper.map(save, OrderForFrontDto.class);
 
-        return StandardResponse.<OrderForFrontDto>builder()
-                .data(orderForFrontDto)
-                .status(Status.SUCCESS)
-                .message("Order updated!")
-                .build();
+        return StandardResponse.ok("Order updated!",orderForFrontDto);
     }
 
 
 
     public Page<OrderForFrontDto> getCancelledOrders(Pageable pageable){
         Page<OrderEntity> orderEntities = orderRepository.findOrderEntityByOrderStatus(pageable);
-       return  orderEntities.map(order -> new OrderForFrontDto(order.getId(),order.getTotalAmount(),
-               order.getOrderStatus(),
-               order.getShippingAddress(), order.getBillingAddress()));
+       return  orderEntities.map(orderMapper::toDto);
     }
 
 
 
     public Page<OrderForFrontDto> getMyOrders(Pageable pageable, Principal principal){
         Page<OrderEntity> orderEntities = orderRepository.findOrderEntityByUserId(pageable,userRepository.findUserEntityByEmail(principal.getName()));
-        return orderEntities.map(order -> new OrderForFrontDto(order.getId(),order.getTotalAmount(),order.getOrderStatus(),
-                order.getShippingAddress(), order.getBillingAddress()));
+        return orderEntities.map(orderMapper::toDto);
     }
 
 
@@ -201,11 +175,7 @@ public class OrderService {
         }
         order.setOrderStatus(OrderStatus.DELIVERED);
         orderRepository.save(order);
-        return StandardResponse.<String>builder()
-                .status(Status.SUCCESS)
-                .message("Order has delivered!")
-                .data("DELIVERED")
-                .build();
+        return StandardResponse.ok("Order has delivered!","DELIVERED");
     }
 
 
@@ -229,11 +199,7 @@ public class OrderService {
             orderRepository.save(order);
         }
 
-        return StandardResponse.<String>builder()
-                .status(Status.SUCCESS)
-                .message("Orders deleted!")
-                .data("DELETED")
-                .build();
+        return StandardResponse.ok("Orders deleted!","DELETED");
     }
 
 }

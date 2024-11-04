@@ -11,7 +11,6 @@ import uz.com.onlineshop.model.entity.verification.VerificationEntity;
 import uz.com.onlineshop.repository.UserRepository;
 import uz.com.onlineshop.repository.VerificationRepository;
 import uz.com.onlineshop.standard.StandardResponse;
-import uz.com.onlineshop.standard.Status;
 
 import java.util.Random;
 
@@ -46,20 +45,12 @@ public class MailSendingService {
              verification.setUserId(userEntity.getId());
              verification.setCode(String.valueOf(message));
              verificationRepository.save(verification);
-             return StandardResponse.<String>builder()
-                     .data("verification code sent!")
-                     .status(Status.SUCCESS)
-                     .message("SENT")
-                     .build();
+             return StandardResponse.ok("Verification code sent","SEND");
          }
          verificationEntity.setCode(String.valueOf(message));
          verificationRepository.save(verificationEntity);
 
          javaMailSender.send(simpleMailMessage);
-         return StandardResponse.<String>builder()
-                 .data("verification code sent!")
-                 .status(Status.SUCCESS)
-                 .message("SENT")
-                 .build();
+         return StandardResponse.ok("verification code sent","SENT");
      }
 }

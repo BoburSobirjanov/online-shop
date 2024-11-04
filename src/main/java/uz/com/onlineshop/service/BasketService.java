@@ -12,7 +12,6 @@ import uz.com.onlineshop.repository.BasketRepository;
 import uz.com.onlineshop.repository.ProductRepository;
 import uz.com.onlineshop.repository.UserRepository;
 import uz.com.onlineshop.standard.StandardResponse;
-import uz.com.onlineshop.standard.Status;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -43,11 +42,7 @@ public class BasketService {
         Basket save = basketRepository.save(basket);
         BasketForFrontDto basketForFrontDto = modelMapper.map(save, BasketForFrontDto.class);
 
-        return StandardResponse.<BasketForFrontDto>builder()
-                .status(Status.SUCCESS)
-                .data(basketForFrontDto)
-                .message("Basket created!")
-                .build();
+        return StandardResponse.ok("Basket created",basketForFrontDto);
     }
 
 

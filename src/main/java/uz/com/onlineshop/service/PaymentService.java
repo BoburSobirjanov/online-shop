@@ -19,7 +19,6 @@ import uz.com.onlineshop.repository.OrderRepository;
 import uz.com.onlineshop.repository.PaymentRepository;
 import uz.com.onlineshop.repository.UserRepository;
 import uz.com.onlineshop.standard.StandardResponse;
-import uz.com.onlineshop.standard.Status;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -73,11 +72,7 @@ public class PaymentService {
         Payment save = paymentRepository.save(payment);
         PaymentForFrontDto paymentForFrontDto = modelMapper.map(save, PaymentForFrontDto.class);
 
-        return StandardResponse.<PaymentForFrontDto>builder()
-                .status(Status.SUCCESS)
-                .message("Payment added")
-                .data(paymentForFrontDto)
-                .build();
+        return StandardResponse.ok("Payment added",paymentForFrontDto);
     }
 
 
@@ -89,11 +84,7 @@ public class PaymentService {
         }
         PaymentForFrontDto paymentForFrontDto = modelMapper.map(payment, PaymentForFrontDto.class);
 
-        return StandardResponse.<PaymentForFrontDto>builder()
-                .status(Status.SUCCESS)
-                .message("This is payment")
-                .data(paymentForFrontDto)
-                .build();
+        return StandardResponse.ok("This is payment",paymentForFrontDto);
     }
 
 
@@ -109,11 +100,7 @@ public class PaymentService {
         payment.setDeletedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         paymentRepository.save(payment);
 
-        return StandardResponse.<String>builder()
-                .status(Status.SUCCESS)
-                .message("Payment deleted!")
-                .data("DELETED")
-                .build();
+        return StandardResponse.ok("Payment deleted","DELETED");
     }
 
 
@@ -133,10 +120,6 @@ public class PaymentService {
             paymentRepository.save(payment);
         }
 
-        return StandardResponse.<String>builder()
-                .status(Status.SUCCESS)
-                .message("Payments deleted!")
-                .data("DELETED")
-                .build();
+        return StandardResponse.ok("Payments deleted","DELETED");
     }
 }

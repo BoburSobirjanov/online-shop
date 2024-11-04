@@ -2,14 +2,18 @@ package uz.com.onlineshop.service;
 
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uz.com.onlineshop.exception.DataNotFoundException;
 import uz.com.onlineshop.exception.NotAcceptableException;
 import uz.com.onlineshop.exception.UserBadRequestException;
+import uz.com.onlineshop.mapper.CreditMapper;
 import uz.com.onlineshop.model.dto.request.CreditDto;
 import uz.com.onlineshop.model.dto.response.CreditForFrontDto;
 import uz.com.onlineshop.model.entity.card.CardEntity;
 import uz.com.onlineshop.model.entity.credit.Credit;
+import uz.com.onlineshop.model.entity.user.UserEntity;
 import uz.com.onlineshop.model.enums.CreditStatus;
 import uz.com.onlineshop.model.entity.order.OrderEntity;
 import uz.com.onlineshop.model.enums.OrderStatus;
@@ -18,7 +22,6 @@ import uz.com.onlineshop.repository.CreditRepository;
 import uz.com.onlineshop.repository.OrderRepository;
 import uz.com.onlineshop.repository.UserRepository;
 import uz.com.onlineshop.standard.StandardResponse;
-import uz.com.onlineshop.standard.Status;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -34,6 +37,7 @@ public class CreditService {
     private final UserRepository userRepository;
     private final CardRepository cardRepository;
     private final ModelMapper modelMapper;
+    private final CreditMapper creditMapper;
 
 
 
@@ -61,11 +65,7 @@ public class CreditService {
 
         CreditForFrontDto creditForFrontDto = modelMapper.map(save, CreditForFrontDto.class);
 
-        return StandardResponse.<CreditForFrontDto>builder()
-                .status(Status.SUCCESS)
-                .message("Credit created!")
-                .data(creditForFrontDto)
-                .build();
+        return StandardResponse.ok("Credit saved!",creditForFrontDto);
     }
 
 
@@ -79,11 +79,7 @@ public class CreditService {
         }
         CreditForFrontDto creditForFrontDto = modelMapper.map(credit, CreditForFrontDto.class);
 
-        return StandardResponse.<CreditForFrontDto>builder()
-                .status(Status.SUCCESS)
-                .message("This is credit!")
-                .data(creditForFrontDto)
-                .build();
+        return StandardResponse.ok("This is credit!",creditForFrontDto);
     }
 
 
@@ -103,11 +99,7 @@ public class CreditService {
         credit.get().setDeletedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         creditRepository.save(credit.get());
 
-        return StandardResponse.<String>builder()
-                .status(Status.SUCCESS)
-                .message("Credit deleted!")
-                .data("DELETED")
-                .build();
+        return StandardResponse.ok("Credit deleted","DELETED");
     }
 
 
@@ -130,20 +122,58 @@ public class CreditService {
         if (amount>credit.get().getCreditAmount()){
             throw new UserBadRequestException("You must be pay only " + credit.get().getCreditAmount()+" UZS");
         }
-        credit.get().setCreditAmount(credit.get().getCreditAmount()-amount);
-        credit.get().setHasBeenPaid(credit.get().getHasBeenPaid() + amount);
-        credit.get().setMustBePaid(credit.get().getCreditAmount() - credit.get().getHasBeenPaid());
-        Credit save = creditRepository.save(credit.get());
+        Credit creditEntity = credit.get();
+        creditEntity.setCreditAmount(creditEntity.getCreditAmount()-amount);
+        creditEntity.setHasBeenPaid(creditEntity.getHasBeenPaid() + amount);
+        creditEntity.setMustBePaid(creditEntity.getCreditAmount() - creditEntity.getHasBeenPaid());
+        Credit save = creditRepository.save(creditEntity);
         if (save.getCreditAmount()==0){
             save.setCreditStatus(CreditStatus.COMPLETED);
             creditRepository.save(save);
         }
         CreditForFrontDto creditForFrontDto = modelMapper.map(save, CreditForFrontDto.class);
 
-        return StandardResponse.<CreditForFrontDto>builder()
-                .status(Status.SUCCESS)
-                .message(amount + " UZS paid for credit!")
-                .data(creditForFrontDto)
-                .build();
+        return StandardResponse.ok(amount + " UZS paid for credit!",creditForFrontDto);
+    }
+
+
+
+
+
+    public Page<CreditForFrontDto> findAll(Pageable pageable){
+        Page<Credit> credits = creditRepository.findAllCredits(pageable);
+
+        if (credits.isEmpty()){
+            throw new DataNotFoundException("Credits not found!");
+        }
+
+        return credits.map(creditMapper::toDto);
+    }
+
+
+
+
+
+
+    public Page<CreditForFrontDto> getMyCredits(Principal principal,Pageable pageable){
+        UserEntity user = userRepository.findUserEntityByEmail(principal.getName());
+        Page<Credit> credits = creditRepository.findAllByUser(user,pageable);
+        if (credits.isEmpty()){
+            throw new DataNotFoundException("Credits not found!");
+        }
+        return credits.map(creditMapper::toDto);
+    }
+
+
+
+
+
+    public Page<CreditForFrontDto> getUsersCredit(UUID id, Pageable pageable){
+        UserEntity user = userRepository.findUserEntityById(id);
+        Page<Credit> credits = creditRepository.findAllByUser(user,pageable);
+        if (credits.isEmpty()){
+            throw new DataNotFoundException("Credit not found!");
+        }
+        return credits.map(creditMapper::toDto);
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uz.com.onlineshop.exception.DataHasAlreadyExistException;
 import uz.com.onlineshop.exception.DataNotFoundException;
 import uz.com.onlineshop.exception.NotAcceptableException;
+import uz.com.onlineshop.mapper.CardMapper;
 import uz.com.onlineshop.model.dto.request.CardDto;
 import uz.com.onlineshop.model.dto.response.CardForFrontDto;
 import uz.com.onlineshop.model.entity.card.CardEntity;
@@ -16,7 +17,6 @@ import uz.com.onlineshop.model.entity.user.UserEntity;
 import uz.com.onlineshop.repository.CardRepository;
 import uz.com.onlineshop.repository.UserRepository;
 import uz.com.onlineshop.standard.StandardResponse;
-import uz.com.onlineshop.standard.Status;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -29,6 +29,7 @@ public class CardService {
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final CardMapper cardMapper;
 
 
     public StandardResponse<CardForFrontDto> save(CardDto cardDto, Principal principal){
@@ -51,11 +52,7 @@ public class CardService {
         card.setUserId(userRepository.findUserEntityByEmail(principal.getName()));
         CardEntity save = cardRepository.save(card);
         CardForFrontDto cardForFrontDto = modelMapper.map(save, CardForFrontDto.class);
-        return StandardResponse.<CardForFrontDto>builder()
-                .data(cardForFrontDto)
-                .status(Status.SUCCESS)
-                .message("Card added!")
-                .build();
+        return StandardResponse.ok("Card added!",cardForFrontDto);
     }
 
 
@@ -89,11 +86,7 @@ public class CardService {
         card.setDeletedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         cardRepository.save(card);
 
-        return StandardResponse.<String>builder()
-                .data("DELETED")
-                .status(Status.SUCCESS)
-                .message("Card has deleted!")
-                .build();
+        return StandardResponse.ok("Card deleted","DELETED");
     }
 
 
@@ -104,8 +97,7 @@ public class CardService {
 
     public Page<CardForFrontDto> getCardsByType(Pageable pageable, String type){
         Page<CardEntity> cardEntities = cardRepository.findCardEntityByCardType(pageable, type);
-        return cardEntities.map(cardEntity -> new CardForFrontDto(cardEntity.getId(), cardEntity.getCardNumber(),
-                cardEntity.getCardType(), cardEntity.getExpireDate()));
+        return cardEntities.map(cardMapper::toDto);
     }
 
 
@@ -115,8 +107,7 @@ public class CardService {
 
     public Page<CardForFrontDto> getAllCards(Pageable pageable){
         Page<CardEntity> cardEntities = cardRepository.findAllCards(pageable);
-        return cardEntities.map(cardEntity -> new CardForFrontDto(cardEntity.getId(), cardEntity.getCardNumber(),
-                cardEntity.getCardType(), cardEntity.getExpireDate()));
+        return cardEntities.map(cardMapper::toDto);
     }
 
 
@@ -130,11 +121,7 @@ public class CardService {
             throw new DataNotFoundException("Card not found!");
         }
         CardForFrontDto cardForFrontDto = modelMapper.map(card, CardForFrontDto.class);
-        return StandardResponse.<CardForFrontDto>builder()
-                .data(cardForFrontDto)
-                .status(Status.SUCCESS)
-                .message("This is card")
-                .build();
+        return StandardResponse.ok("This is card!",cardForFrontDto);
     }
 
 
@@ -148,11 +135,7 @@ public class CardService {
         }
         card.setCardBalance(card.getCardBalance()+balance);
         cardRepository.save(card);
-        return StandardResponse.<String>builder()
-                .data("FILLED BALANCE")
-                .status(Status.SUCCESS)
-                .message("Card's balance filled!")
-                .build();
+        return StandardResponse.ok("Card's balance filled","FILLED BALANCE");
     }
 
 
@@ -163,8 +146,7 @@ public class CardService {
         UserEntity user = userRepository.findUserEntityByEmail(principal.getName());
         Page<CardEntity> cards = cardRepository.findAllByUserId(pageable,user);
 
-        return cards.map(cardEntity -> new CardForFrontDto(cardEntity.getId(), cardEntity.getCardNumber(),
-                cardEntity.getCardType(), cardEntity.getExpireDate()));
+        return cards.map(cardMapper::toDto);
     }
 
 }

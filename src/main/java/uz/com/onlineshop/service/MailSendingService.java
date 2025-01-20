@@ -12,6 +12,7 @@ import uz.com.onlineshop.repository.UserRepository;
 import uz.com.onlineshop.repository.VerificationRepository;
 import uz.com.onlineshop.standard.StandardResponse;
 
+import java.time.LocalDateTime;
 import java.util.Random;
 
 @Service
@@ -45,9 +46,10 @@ public class MailSendingService {
              verification.setUserId(userEntity.getId());
              verification.setCode(String.valueOf(message));
              verificationRepository.save(verification);
-             return StandardResponse.ok("Verification code sent","SEND");
+             return StandardResponse.ok("Verification code sent","SENT");
          }
          verificationEntity.setCode(String.valueOf(message));
+         verificationEntity.setCreatedTime(LocalDateTime.now());
          verificationRepository.save(verificationEntity);
 
          javaMailSender.send(simpleMailMessage);

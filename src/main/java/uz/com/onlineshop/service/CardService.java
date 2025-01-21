@@ -149,4 +149,16 @@ public class CardService {
         return cards.map(cardMapper::toDto);
     }
 
+
+
+    public Page<CardForFrontDto> getUsersCards(Pageable pageable, UUID userId){
+        UserEntity user = userRepository.findUserEntityById(userId);
+        if (user==null){
+            throw new DataNotFoundException("User not found!");
+        }
+        Page<CardEntity> cardEntityByUserId = cardRepository.findCardEntityByUserId(pageable,user);
+
+        return cardEntityByUserId.map(cardMapper::toDto);
+    }
+
 }

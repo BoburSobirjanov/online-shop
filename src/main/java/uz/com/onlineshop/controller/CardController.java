@@ -115,4 +115,15 @@ public class CardController {
         return cardService.getMyCards(pageable,principal);
     }
 
+
+    @GetMapping("/get-users-cards/{id}")
+    public Page<CardForFrontDto> getUsersCards(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @PathVariable UUID id
+    ){
+        Pageable pageable = PageRequest.of(page,size);
+        return cardService.getUsersCards(pageable,id);
+    }
+
 }

@@ -14,7 +14,6 @@ import java.util.UUID;
 public interface CardRepository extends JpaRepository<CardEntity, UUID> {
 
 
-
     @Query("select c from cards as c where c.isDeleted=false and c.cardNumber ilike %?1%")
     CardEntity findCardEntityByCardNumber(String number);
 
@@ -40,5 +39,5 @@ public interface CardRepository extends JpaRepository<CardEntity, UUID> {
 
 
     @Query("select c from cards as c where c.isDeleted=false and c.userId=?1")
-    CardEntity findCardEntityByUserId(UserEntity user);
+    Page<CardEntity> findCardEntityByUserId(Pageable pageable, UserEntity user);
 }

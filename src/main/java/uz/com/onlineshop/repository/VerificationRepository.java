@@ -15,8 +15,6 @@ public interface VerificationRepository extends JpaRepository<VerificationEntity
     VerificationEntity findByUserEmailAndCode(UUID id, String code);
 
 
-
-
     @Query("select u from verification as u where u.userId=?1")
     VerificationEntity findVerificationEntityByUserId(UUID id);
 

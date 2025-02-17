@@ -15,6 +15,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/payment")
+@CrossOrigin
 public class PaymentController {
 
     private final PaymentService paymentService;
@@ -23,19 +24,17 @@ public class PaymentController {
     public StandardResponse<PaymentForFrontDto> payForOrder(
             @RequestBody PaymentDto paymentDto,
             Principal principal
-            ){
-        return paymentService.payForOrder(paymentDto,principal);
+    ) {
+        return paymentService.payForOrder(paymentDto, principal);
     }
-
 
 
     @GetMapping("/get-by-id/{id}")
     public StandardResponse<PaymentForFrontDto> getById(
             @PathVariable UUID id
-            ){
+    ) {
         return paymentService.getById(id);
     }
-
 
 
     @DeleteMapping("/{id}/delete")
@@ -43,11 +42,9 @@ public class PaymentController {
     public StandardResponse<String> delete(
             @PathVariable UUID id,
             Principal principal
-    ){
+    ) {
         return paymentService.deleteById(id, principal);
     }
-
-
 
 
     @DeleteMapping("/multi-delete")
@@ -55,7 +52,7 @@ public class PaymentController {
     public StandardResponse<String> multiDelete(
             @RequestBody List<String> id,
             Principal principal
-    ){
-       return paymentService.multiDeleteById(id, principal);
+    ) {
+        return paymentService.multiDeleteById(id, principal);
     }
 }

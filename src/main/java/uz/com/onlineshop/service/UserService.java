@@ -42,105 +42,81 @@ public class UserService {
     private final UserMapper userMapper;
 
 
-
-
-
-    public StandardResponse<JwtResponse> signUp (UserDto userDto){
-       checkUserEmailAndPhoneNumber(userDto.getEmail(), userDto.getPhoneNumber());
-       UserEntity userEntity = modelMapper.map(userDto, UserEntity.class);
-       userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
-       try {
-           userEntity.setGender(Gender.valueOf(userDto.getGender()));
-       }catch (Exception e){
-           throw new NotAcceptableException("Gender not found");
-       }
-       userEntity.setAddress(userDto.getAddress());
-       userEntity.setRole(UserRole.USER);
-       userEntity.setFullName(userDto.getFullName());
-       userEntity.setUsername(userDto.getUsername());
-       userEntity.setEmail(userDto.getEmail());
-       userEntity.setUserStatus(UserStatus.ACTIVE);
-       userEntity.setPhoneNumber(userDto.getPhoneNumber());
-       userRepository.save(userEntity);
-       String accessToken = jwtService.generateAccessToken(userEntity);
-       String refreshToken = jwtService.generateRefreshToken(userEntity);
-       UserForFrontDto userForFrontDto = modelMapper.map(userEntity, UserForFrontDto.class);
-       JwtResponse jwtResponse = JwtResponse.builder()
-               .userForFrontDto(userForFrontDto)
-               .accessToken(accessToken)
-               .refreshToken(refreshToken)
-               .build();
-       return StandardResponse.ok("Signed up!",jwtResponse);
+    public StandardResponse<JwtResponse> signUp(UserDto userDto) {
+        checkUserEmailAndPhoneNumber(userDto.getEmail(), userDto.getPhoneNumber());
+        UserEntity userEntity = modelMapper.map(userDto, UserEntity.class);
+        userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        try {
+            userEntity.setGender(Gender.valueOf(userDto.getGender()));
+        } catch (Exception e) {
+            throw new NotAcceptableException("Gender not found");
+        }
+        userEntity.setAddress(userDto.getAddress());
+        userEntity.setRole(UserRole.USER);
+        userEntity.setFullName(userDto.getFullName());
+        userEntity.setUsername(userDto.getUsername());
+        userEntity.setEmail(userDto.getEmail());
+        userEntity.setUserStatus(UserStatus.ACTIVE);
+        userEntity.setPhoneNumber(userDto.getPhoneNumber());
+        userRepository.save(userEntity);
+        String accessToken = jwtService.generateAccessToken(userEntity);
+        String refreshToken = jwtService.generateRefreshToken(userEntity);
+        UserForFrontDto userForFrontDto = modelMapper.map(userEntity, UserForFrontDto.class);
+        JwtResponse jwtResponse = JwtResponse.builder()
+                .userForFrontDto(userForFrontDto)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+        return StandardResponse.ok("Signed up!", jwtResponse);
     }
-
-
-
-
 
 
     private void checkUserEmailAndPhoneNumber(String email, String phoneNumber) {
         UserEntity userEntity = userRepository.findUserEntityByEmail(email);
-        if (userEntity!=null){
+        if (userEntity != null) {
             throw new DataNotFoundException("User has already exist");
-                    }
-       if (userRepository.findUserEntityByPhoneNumber(phoneNumber)!=null){
-           throw new DataNotFoundException("User has already exist");
-       }
+        }
+        if (userRepository.findUserEntityByPhoneNumber(phoneNumber) != null) {
+            throw new DataNotFoundException("User has already exist");
+        }
     }
 
 
-
-
-
-
-
-
-
-    public StandardResponse<JwtResponse> signIn(LoginDto loginDto){
-          UserEntity userEntity = userRepository.findUserEntityByEmail(loginDto.getEmail());
-          if (userEntity==null || userEntity.getUserStatus()==UserStatus.BLOCKED){
-              throw new DataNotFoundException("User not found!");
-          }
-        if (passwordEncoder.matches(loginDto.getPassword(), userEntity.getPassword())){
-           String accessToken = jwtService.generateAccessToken(userEntity);
-           String refreshToken = jwtService.generateRefreshToken(userEntity);
-           UserForFrontDto userForFrontDto =  modelMapper.map(userEntity, UserForFrontDto.class);
-           JwtResponse jwtResponse = JwtResponse.builder()
-                   .refreshToken(refreshToken)
-                   .accessToken(accessToken)
-                   .userForFrontDto(userForFrontDto)
-                   .build();
-           return StandardResponse.ok("Signed in", jwtResponse);
+    public StandardResponse<JwtResponse> signIn(LoginDto loginDto) {
+        UserEntity userEntity = userRepository.findUserEntityByEmail(loginDto.getEmail());
+        if (userEntity == null || userEntity.getUserStatus() == UserStatus.BLOCKED) {
+            throw new DataNotFoundException("User not found!");
         }
-        else {
+        if (passwordEncoder.matches(loginDto.getPassword(), userEntity.getPassword())) {
+            String accessToken = jwtService.generateAccessToken(userEntity);
+            String refreshToken = jwtService.generateRefreshToken(userEntity);
+            UserForFrontDto userForFrontDto = modelMapper.map(userEntity, UserForFrontDto.class);
+            JwtResponse jwtResponse = JwtResponse.builder()
+                    .refreshToken(refreshToken)
+                    .accessToken(accessToken)
+                    .userForFrontDto(userForFrontDto)
+                    .build();
+            return StandardResponse.ok("Signed in", jwtResponse);
+        } else {
             throw new UserBadRequestException("Something error during sign in!");
         }
     }
 
 
-
-
-
-
-
-    public StandardResponse<UserForFrontDto> getById(UUID id){
+    public StandardResponse<UserForFrontDto> getById(UUID id) {
         UserEntity userEntity = userRepository.findUserEntityById(id);
-        if (userEntity==null){
+        if (userEntity == null) {
             throw new DataNotFoundException("User not found!");
         }
         UserForFrontDto userForFrontDto = modelMapper.map(userEntity, UserForFrontDto.class);
-        return StandardResponse.ok("This is user",userForFrontDto);
+        return StandardResponse.ok("This is user", userForFrontDto);
     }
 
 
-
-
-
-
-    public StandardResponse<String> deleteUser(UUID id, Principal principal){
+    public StandardResponse<String> deleteUser(UUID id, Principal principal) {
         UserEntity user = userRepository.findUserEntityByEmail(principal.getName());
         UserEntity userEntity = userRepository.findUserEntityById(id);
-        if (userEntity==null){
+        if (userEntity == null) {
             throw new DataNotFoundException("User not found!");
         }
         userEntity.setDeleted(true);
@@ -148,17 +124,13 @@ public class UserService {
         userEntity.setDeletedBy(user.getId());
         userRepository.save(userEntity);
 
-        return StandardResponse.ok("User deleted!","DELETED");
+        return StandardResponse.ok("User deleted!", "DELETED");
     }
 
 
-
-
-
-
-    public StandardResponse<UserForFrontDto> assignToAdmin(UUID id, Principal principal){
+    public StandardResponse<UserForFrontDto> assignToAdmin(UUID id, Principal principal) {
         UserEntity userEntity = userRepository.findUserEntityById(id);
-        if (userEntity==null){
+        if (userEntity == null) {
             throw new DataNotFoundException("User not found!");
         }
         userEntity.setRole(UserRole.ADMIN);
@@ -166,20 +138,15 @@ public class UserService {
         UserEntity save = userRepository.save(userEntity);
         UserForFrontDto userForFrontDto = modelMapper.map(save, UserForFrontDto.class);
 
-        return StandardResponse.ok("User's role changed!",userForFrontDto);
+        return StandardResponse.ok("User's role changed!", userForFrontDto);
     }
 
 
-
-
-
-
-
-    public StandardResponse<String> forgotPassword(String code,String newPassword, Principal principal){
+    public StandardResponse<String> forgotPassword(String code, String newPassword, Principal principal) {
         UserEntity userEntity = userRepository.findUserEntityByEmail(principal.getName());
-        VerificationEntity verification =  verificationRepository.findByUserEmailAndCode(userEntity.getId(),code);
+        VerificationEntity verification = verificationRepository.findByUserEmailAndCode(userEntity.getId(), code);
         if (!verification.getCode().equals(code) ||
-                verification.getCreatedTime().plusMinutes(5).isBefore(LocalDateTime.now())){
+                verification.getCreatedTime().plusMinutes(5).isBefore(LocalDateTime.now())) {
             throw new NotAcceptableException("Verification code is incorrect or expired!");
         }
         UserEntity user = userRepository.findUserEntityByEmail(principal.getName());
@@ -187,17 +154,13 @@ public class UserService {
         verificationRepository.delete(verification);
         userRepository.save(user);
 
-        return StandardResponse.ok("User password changed!","CHANGED");
+        return StandardResponse.ok("User password changed!", "CHANGED");
     }
 
 
-
-
-
-
-    public StandardResponse<UserForFrontDto> updateProfile(UUID id, UserDto userDto, Principal principal){
+    public StandardResponse<UserForFrontDto> updateProfile(UUID id, UserDto userDto, Principal principal) {
         UserEntity userEntity = userRepository.findUserEntityById(id);
-        if (userEntity==null){
+        if (userEntity == null) {
             throw new DataNotFoundException("User not found!");
         }
         userEntity.setEmail(userDto.getEmail());
@@ -209,121 +172,98 @@ public class UserService {
         userEntity.setPhoneNumber(userDto.getPhoneNumber());
         try {
             userEntity.setGender(Gender.valueOf(userDto.getGender()));
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new NotAcceptableException("Invalid gender");
         }
         userEntity.setUpdatedTime(LocalDateTime.now());
         UserEntity save = userRepository.save(userEntity);
         UserForFrontDto userForFrontDto = modelMapper.map(save, UserForFrontDto.class);
-        return StandardResponse.ok("User updated!",userForFrontDto);
+        return StandardResponse.ok("User updated!", userForFrontDto);
     }
 
 
-
-
-
-    public Page<UserForFrontDto> getAll(Pageable pageable){
+    public Page<UserForFrontDto> getAll(Pageable pageable) {
         Page<UserEntity> users = userRepository.findAllUsers(pageable);
         return users.map(userMapper::toDto);
     }
 
 
-
-
-
-    public StandardResponse<String> userBlocked(UUID id, Principal principal){
+    public StandardResponse<String> userBlocked(UUID id, Principal principal) {
         UserEntity userEntity = userRepository.findUserEntityById(id);
-        if (userEntity==null || userEntity.getUserStatus()==UserStatus.BLOCKED){
+        if (userEntity == null || userEntity.getUserStatus() == UserStatus.BLOCKED) {
             throw new DataNotFoundException("User not found or this user has already blocked");
         }
         userEntity.setUserStatus(UserStatus.BLOCKED);
         userEntity.setBlockedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         userRepository.save(userEntity);
 
-        return StandardResponse.ok("User blocked!","BLOCKED");
+        return StandardResponse.ok("User blocked!", "BLOCKED");
     }
 
 
-
-
-
-
-    public StandardResponse<String> userActivated(UUID id, Principal principal){
+    public StandardResponse<String> userActivated(UUID id, Principal principal) {
         UserEntity userEntity = userRepository.findUserEntityById(id);
-        if (userEntity==null || userEntity.getUserStatus()==UserStatus.ACTIVE){
+        if (userEntity == null || userEntity.getUserStatus() == UserStatus.ACTIVE) {
             throw new DataNotFoundException("User not found or this user has already activated!");
         }
         userEntity.setUserStatus(UserStatus.ACTIVE);
         userEntity.setActiveBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         userRepository.save(userEntity);
 
-        return StandardResponse.ok("User activated!","ACTIVATED");
+        return StandardResponse.ok("User activated!", "ACTIVATED");
     }
 
 
-
-
-
-    public Page<UserForFrontDto> getUserByStatus(Pageable pageable, String status){
+    public Page<UserForFrontDto> getUserByStatus(Pageable pageable, String status) {
         Page<UserEntity> userEntities = userRepository.findUserEntityByUserStatus(pageable, status);
         return userEntities.map(userMapper::toDto);
     }
 
 
-
-
-    public List<UserEntity> getAllUsersToExcel(){
+    public List<UserEntity> getAllUsersToExcel() {
         List<UserEntity> userEntities = userRepository.getAllUsersToExcel();
-        if (userEntities==null){
+        if (userEntities == null) {
             throw new DataNotFoundException("Users not found!");
         }
         return userEntities;
     }
 
 
-
-
-    public StandardResponse<String> multiDeleteById(List<String> id, Principal principal){
+    public StandardResponse<String> multiDeleteById(List<String> id, Principal principal) {
         List<UserEntity> userList = userRepository.findAllById(id
                 .stream()
                 .map(UUID::fromString)
                 .collect(Collectors.toList()));
 
-        if (userList.isEmpty()){
+        if (userList.isEmpty()) {
             throw new DataNotFoundException("Users not found!");
         }
 
-        for (UserEntity user: userList) {
+        for (UserEntity user : userList) {
             user.setDeletedTime(LocalDateTime.now());
             user.setDeleted(true);
             user.setDeletedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
             userRepository.save(user);
         }
 
-        return StandardResponse.ok("User deleted!","DELETED");
+        return StandardResponse.ok("User deleted!", "DELETED");
     }
 
 
-
-
-
-    public StandardResponse<UserForFrontDto> searchUserByNumber(String number){
+    public StandardResponse<UserForFrontDto> searchUserByNumber(String number) {
         UserEntity user = userRepository.findUserEntityByPhoneNumber(number);
-        if (user==null){
+        if (user == null) {
             throw new DataNotFoundException("User not found!");
         }
         UserForFrontDto userForFrontDto = modelMapper.map(user, UserForFrontDto.class);
 
-        return StandardResponse.ok("This is user",userForFrontDto);
+        return StandardResponse.ok("This is user", userForFrontDto);
     }
 
 
-
-
-
-    public Page<UserForFrontDto> searchByName(String name, Pageable pageable){
+    public Page<UserForFrontDto> searchByName(String name, Pageable pageable) {
         Page<UserEntity> userEntities = userRepository.findUserEntityByFullName(name, pageable);
-        if (userEntities.isEmpty()){
+        if (userEntities.isEmpty()) {
             throw new DataNotFoundException("User not found!");
         }
 

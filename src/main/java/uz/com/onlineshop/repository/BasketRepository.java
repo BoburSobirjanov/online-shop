@@ -7,6 +7,7 @@ import uz.com.onlineshop.model.entity.basket.Basket;
 
 import java.util.Optional;
 import java.util.UUID;
+
 @Repository
 public interface BasketRepository extends JpaRepository<Basket, UUID> {
 

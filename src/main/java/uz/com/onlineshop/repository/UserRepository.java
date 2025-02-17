@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface UserRepository extends JpaRepository<UserEntity,UUID> {
+public interface UserRepository extends JpaRepository<UserEntity, UUID> {
 
 
     @Query("select u from users as u where u.isDeleted=false and u.email=?1")
@@ -22,11 +22,8 @@ public interface UserRepository extends JpaRepository<UserEntity,UUID> {
     UserEntity findUserEntityByPhoneNumber(String phoneNumber);
 
 
-
     @Query("select u from users as u where u.isDeleted=false and u.id=?1")
     UserEntity findUserEntityById(UUID id);
-
-
 
 
     @Query("select u from users as u where u.isDeleted=false")

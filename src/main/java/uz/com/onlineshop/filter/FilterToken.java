@@ -17,12 +17,13 @@ import java.io.IOException;
 public class FilterToken extends OncePerRequestFilter {
     private AuthenticationService authenticationService;
     private JwtService jwtService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String token = request.getHeader("authorization");
-        if(token == null || !token.startsWith("Bearer ")) {
+        if (token == null || !token.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }

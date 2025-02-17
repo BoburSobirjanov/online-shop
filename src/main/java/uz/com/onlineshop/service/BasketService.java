@@ -29,10 +29,10 @@ public class BasketService {
 
 
     @Transactional
-    public StandardResponse<BasketForFrontDto> save(BasketDto basketDto, Principal principal){
+    public StandardResponse<BasketForFrontDto> save(BasketDto basketDto, Principal principal) {
         List<ProductEntity> productEntities = new ArrayList<>();
         List<String> products = basketDto.getProductEntities();
-        for (String id : products){
+        for (String id : products) {
             ProductEntity product = productRepository.findProductEntityById(UUID.fromString(id));
             productEntities.add(product);
         }
@@ -42,7 +42,7 @@ public class BasketService {
         Basket save = basketRepository.save(basket);
         BasketForFrontDto basketForFrontDto = modelMapper.map(save, BasketForFrontDto.class);
 
-        return StandardResponse.ok("Basket created",basketForFrontDto);
+        return StandardResponse.ok("Basket created", basketForFrontDto);
     }
 
 

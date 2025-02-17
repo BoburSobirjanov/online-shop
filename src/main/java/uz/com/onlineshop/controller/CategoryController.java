@@ -23,11 +23,10 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/category")
+@CrossOrigin
 public class CategoryController {
 
     private final CategoryService categoryService;
-
-
 
 
     @PostMapping("/save")
@@ -36,8 +35,8 @@ public class CategoryController {
             @Valid
             @RequestBody CategoryDto categoryDto,
             BindingResult bindingResult
-            )throws RequestValidationException {
-        if (bindingResult.hasErrors()){
+    ) throws RequestValidationException {
+        if (bindingResult.hasErrors()) {
             List<ObjectError> allErrors = bindingResult.getAllErrors();
             throw new RequestValidationException(allErrors);
         }
@@ -45,36 +44,22 @@ public class CategoryController {
     }
 
 
-
-
-
-
-
     @DeleteMapping("/{id}/delete-by-id")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
     public StandardResponse<String> delete(
             @PathVariable UUID id,
             Principal principal
-            ){
+    ) {
         return categoryService.delete(id, principal);
     }
-
-
-
-
-
 
 
     @GetMapping("/get-by-id/{id}")
     public StandardResponse<CategoryForFrontDto> getById(
             @PathVariable UUID id
-    ){
+    ) {
         return categoryService.getById(id);
     }
-
-
-
-
 
 
     @GetMapping("/get-all-categories")
@@ -85,20 +70,15 @@ public class CategoryController {
     }
 
 
-
-
-
     @PutMapping("/update-category/{id}")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
     public StandardResponse<CategoryForFrontDto> update(
             @PathVariable UUID id,
             @RequestBody CategoryDto categoryDto,
             Principal principal
-    ){
+    ) {
         return categoryService.update(id, categoryDto, principal);
     }
-
-
 
 
     @DeleteMapping("/multi-delete")
@@ -106,7 +86,7 @@ public class CategoryController {
     public StandardResponse<String> multiDelete(
             @RequestBody List<String> id,
             Principal principal
-    ){
+    ) {
         return categoryService.multiDeleteById(id, principal);
     }
 }

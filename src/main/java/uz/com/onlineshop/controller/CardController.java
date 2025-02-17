@@ -23,20 +23,19 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/card")
+@CrossOrigin
 public class CardController {
 
 
-
     private final CardService cardService;
-
 
 
     @PostMapping("/save-card")
     public ResponseEntity<StandardResponse<CardForFrontDto>> save(
             @Valid @RequestBody CardDto cardDto,
             Principal principal, BindingResult bindingResult
-            ) throws RequestValidationException {
-        if (bindingResult.hasErrors()){
+    ) throws RequestValidationException {
+        if (bindingResult.hasErrors()) {
             List<ObjectError> allErrors = bindingResult.getAllErrors();
             throw new RequestValidationException(allErrors);
         }
@@ -44,17 +43,13 @@ public class CardController {
     }
 
 
-
-
     @DeleteMapping("/{id}/remove-card")
     public StandardResponse<String> delete(
             @PathVariable UUID id,
             Principal principal
-            ){
+    ) {
         return cardService.delete(id, principal);
     }
-
-
 
 
     @GetMapping("/get-all-by-type")
@@ -63,13 +58,10 @@ public class CardController {
             @RequestParam String type,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
-    ){
-        Pageable pageable = PageRequest.of(page,size);
-        return cardService.getCardsByType(pageable,type);
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return cardService.getCardsByType(pageable, type);
     }
-
-
-
 
 
     @GetMapping("/get-all-cards")
@@ -77,32 +69,27 @@ public class CardController {
     public Page<CardForFrontDto> getAllCards(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
-    ){
+    ) {
         Pageable pageable = PageRequest.of(page, size);
         return cardService.getAllCards(pageable);
     }
 
 
-
-
-
     @GetMapping("/get-by-id/{id}")
     public StandardResponse<CardForFrontDto> getById(
             @PathVariable UUID id
-    ){
+    ) {
         return cardService.getById(id);
     }
-
 
 
     @PutMapping("/{id}/filled-balance")
     public StandardResponse<String> filledBalance(
             @PathVariable UUID id,
             @RequestParam Double balance
-    ){
+    ) {
         return cardService.fillCardBalance(id, balance);
     }
-
 
 
     @GetMapping("/get-my-cards")
@@ -110,9 +97,9 @@ public class CardController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Principal principal
-    ){
-        Pageable pageable = PageRequest.of(page,size);
-        return cardService.getMyCards(pageable,principal);
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return cardService.getMyCards(pageable, principal);
     }
 
 
@@ -121,9 +108,9 @@ public class CardController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @PathVariable UUID id
-    ){
-        Pageable pageable = PageRequest.of(page,size);
-        return cardService.getUsersCards(pageable,id);
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return cardService.getUsersCards(pageable, id);
     }
 
 }

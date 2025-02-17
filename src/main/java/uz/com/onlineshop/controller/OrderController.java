@@ -23,10 +23,10 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/order")
+@CrossOrigin
 public class OrderController {
 
     private final OrderService orderService;
-
 
 
     @PostMapping("/save")
@@ -34,25 +34,21 @@ public class OrderController {
             @Valid
             @RequestBody OrderDto orderDto,
             Principal principal, BindingResult bindingResult
-            )throws RequestValidationException {
-        if (bindingResult.hasErrors()){
+    ) throws RequestValidationException {
+        if (bindingResult.hasErrors()) {
             List<ObjectError> allErrors = bindingResult.getAllErrors();
             throw new RequestValidationException(allErrors);
         }
-      return  ResponseEntity.ok(orderService.save(orderDto, principal));
+        return ResponseEntity.ok(orderService.save(orderDto, principal));
     }
-
-
 
 
     @GetMapping("/get-by-id/{id}")
     public StandardResponse<OrderForFrontDto> getById(
             @PathVariable UUID id
-            ){
+    ) {
         return orderService.getById(id);
     }
-
-
 
 
     @DeleteMapping("/{id}/delete-by-id")
@@ -60,20 +56,17 @@ public class OrderController {
     public StandardResponse<String> deleteById(
             @PathVariable UUID id,
             Principal principal
-    ){
+    ) {
         return orderService.delete(id, principal);
     }
-
 
 
     @PutMapping("/{id}/cancel")
     public StandardResponse<OrderForFrontDto> cancel(
             @PathVariable UUID id
-    ){
+    ) {
         return orderService.cancelOrder(id);
     }
-
-
 
 
     @PutMapping("/update-order/{id}")
@@ -81,10 +74,9 @@ public class OrderController {
             @PathVariable UUID id,
             @RequestBody OrderDto orderDto,
             Principal principal
-    ){
+    ) {
         return orderService.updateOrder(id, orderDto, principal);
     }
-
 
 
     @GetMapping("/get-cancelled-orders")
@@ -92,11 +84,10 @@ public class OrderController {
     public Page<OrderForFrontDto> getCancelled(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
-    ){
+    ) {
         Pageable pageable = PageRequest.of(page, size);
         return orderService.getCancelledOrders(pageable);
     }
-
 
 
     @GetMapping("/get-my-orders")
@@ -104,24 +95,18 @@ public class OrderController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             Principal principal
-    ){
-        Pageable pageable = PageRequest.of(page,size);
-      return  orderService.getMyOrders(pageable,principal);
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return orderService.getMyOrders(pageable, principal);
     }
-
-
-
 
 
     @PutMapping("/{id}/delivered")
     public StandardResponse<String> changeOrderToDelivered(
             @PathVariable UUID id
-    ){
+    ) {
         return orderService.changeOrderToDelivered(id);
     }
-
-
-
 
 
     @DeleteMapping("/multi-delete")
@@ -129,7 +114,7 @@ public class OrderController {
     public StandardResponse<String> multiDelete(
             @RequestBody List<String> id,
             Principal principal
-    ){
+    ) {
         return orderService.multiDeleteById(id, principal);
     }
 }

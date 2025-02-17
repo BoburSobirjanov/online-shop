@@ -12,7 +12,7 @@ import java.nio.file.StandardCopyOption;
 public class ImageUtils {
     private final String UPLOAD_FOLDER = "D:\\9-modul";
 
-    public boolean uploadImage(MultipartFile imageProduct){
+    public boolean uploadImage(MultipartFile imageProduct) {
         boolean isUpload = false;
         try {
             Files.copy(imageProduct.getInputStream(),
@@ -20,18 +20,18 @@ public class ImageUtils {
                     StandardCopyOption.REPLACE_EXISTING);
             isUpload = true;
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return isUpload;
     }
 
-    public boolean checkExisted(MultipartFile imageProduct){
+    public boolean checkExisted(MultipartFile imageProduct) {
         boolean isExisted = false;
         try {
             File file = new File(UPLOAD_FOLDER + "\\" + imageProduct.getOriginalFilename());
             isExisted = file.exists();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return isExisted;

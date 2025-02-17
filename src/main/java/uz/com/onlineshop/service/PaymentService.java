@@ -37,30 +37,29 @@ public class PaymentService {
     private final CardRepository cardRepository;
 
 
-
-    public StandardResponse<PaymentForFrontDto> payForOrder(PaymentDto paymentDto, Principal principal){
+    public StandardResponse<PaymentForFrontDto> payForOrder(PaymentDto paymentDto, Principal principal) {
         Payment payment = modelMapper.map(paymentDto, Payment.class);
         UserEntity user = userRepository.findUserEntityByEmail(principal.getName());
         OrderEntity order = orderRepository.findOrderEntityById(UUID.fromString(paymentDto.getOrderId()));
-        if (order==null){
+        if (order == null) {
             throw new DataNotFoundException("Order not found!");
         }
-        if (order.getOrderStatus()==OrderStatus.PAID){
+        if (order.getOrderStatus() == OrderStatus.PAID) {
             throw new UserBadRequestException("You have already paid for this order!");
         }
-        if (order.getOrderStatus()==OrderStatus.CANCELLED){
+        if (order.getOrderStatus() == OrderStatus.CANCELLED) {
             throw new UserBadRequestException("Can not pay for canceled orders!");
         }
-        CardEntity card =  cardRepository.findCardEntityById(UUID.fromString(paymentDto.getCardId()));
-        if (card==null){
+        CardEntity card = cardRepository.findCardEntityById(UUID.fromString(paymentDto.getCardId()));
+        if (card == null) {
             throw new DataNotFoundException("Card not found!");
         }
-        if (card.getCardBalance()<order.getTotalAmount()){
+        if (card.getCardBalance() < order.getTotalAmount()) {
             payment.setStatus(PaymentStatus.FAILED);
             paymentRepository.save(payment);
             throw new UserBadRequestException("You have no enough balance for this order! Please, fill your balance!");
         }
-        card.setCardBalance(card.getCardBalance()- order.getTotalAmount());
+        card.setCardBalance(card.getCardBalance() - order.getTotalAmount());
         cardRepository.save(card);
         payment.setOrder(order);
         payment.setUser(user);
@@ -72,27 +71,24 @@ public class PaymentService {
         Payment save = paymentRepository.save(payment);
         PaymentForFrontDto paymentForFrontDto = modelMapper.map(save, PaymentForFrontDto.class);
 
-        return StandardResponse.ok("Payment added",paymentForFrontDto);
+        return StandardResponse.ok("Payment added", paymentForFrontDto);
     }
 
 
-
-    public StandardResponse<PaymentForFrontDto> getById(UUID id){
+    public StandardResponse<PaymentForFrontDto> getById(UUID id) {
         Payment payment = paymentRepository.findPaymentById(id);
-        if (payment==null){
+        if (payment == null) {
             throw new DataNotFoundException("Payment not found!");
         }
         PaymentForFrontDto paymentForFrontDto = modelMapper.map(payment, PaymentForFrontDto.class);
 
-        return StandardResponse.ok("This is payment",paymentForFrontDto);
+        return StandardResponse.ok("This is payment", paymentForFrontDto);
     }
 
 
-
-
-    public StandardResponse<String> deleteById(UUID id, Principal principal){
+    public StandardResponse<String> deleteById(UUID id, Principal principal) {
         Payment payment = paymentRepository.findPaymentById(id);
-        if (payment==null){
+        if (payment == null) {
             throw new DataNotFoundException("Payment not found!");
         }
         payment.setDeleted(true);
@@ -100,26 +96,23 @@ public class PaymentService {
         payment.setDeletedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         paymentRepository.save(payment);
 
-        return StandardResponse.ok("Payment deleted","DELETED");
+        return StandardResponse.ok("Payment deleted", "DELETED");
     }
 
 
-
-
-
-    public StandardResponse<String> multiDeleteById(List<String> id, Principal principal){
+    public StandardResponse<String> multiDeleteById(List<String> id, Principal principal) {
         List<Payment> paymentList = paymentRepository.findAllById(id
                 .stream()
                 .map(UUID::fromString)
                 .collect(Collectors.toList()));
 
-        for (Payment payment: paymentList) {
+        for (Payment payment : paymentList) {
             payment.setDeletedTime(LocalDateTime.now());
             payment.setDeleted(true);
             payment.setDeletedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
             paymentRepository.save(payment);
         }
 
-        return StandardResponse.ok("Payments deleted","DELETED");
+        return StandardResponse.ok("Payments deleted", "DELETED");
     }
 }

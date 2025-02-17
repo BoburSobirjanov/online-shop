@@ -10,9 +10,9 @@ import uz.com.onlineshop.model.entity.product.ProductEntity;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-@Repository
-public interface ProductRepository extends JpaRepository<ProductEntity,UUID> {
 
+@Repository
+public interface ProductRepository extends JpaRepository<ProductEntity, UUID> {
 
 
     @Query("select p from products as p where p.isDeleted=false and p.id=?1")
@@ -23,36 +23,28 @@ public interface ProductRepository extends JpaRepository<ProductEntity,UUID> {
     Page<ProductEntity> findProductEntityByCategoryId(Pageable pageable, UUID id);
 
 
-
     @Query("select p from products as p where p.isDeleted=false and p.categoryId=?1")
     List<ProductEntity> getProductEntityByCategoryId(UUID id);
-
 
 
     @Query("select p from products as p where p.isDeleted=false")
     Page<ProductEntity> findAllProducts(Pageable pageable);
 
 
-
     @Query("select p from products as p where p.isDeleted=false order by  p.viewCount desc")
     Page<ProductEntity> findAllByViewCount(Pageable pageable);
-
 
 
     @Query("select p from products as p where p.isDeleted=false order by p.price desc")
     Page<ProductEntity> findAllByPriceDesc(Pageable pageable);
 
 
-
-
     @Query("select p from products as p where p.isDeleted=false order by p.price asc ")
     Page<ProductEntity> findAllProductsByPriceAsc(Pageable pageable);
 
 
-
     @Query("select p from products as p where p.isSale>0 order by p.isSale asc")
     Page<ProductEntity> getAllProductsInSale(Pageable pageable);
-
 
 
     @Query("select p from products as p where p.isDeleted=false and p.id in ?1")

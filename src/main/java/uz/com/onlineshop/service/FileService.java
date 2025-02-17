@@ -30,13 +30,9 @@ public class FileService {
     private final UserRepository userRepository;
 
 
-
-
-
-
     public byte[] generateUserPdf(UUID id) {
         UserEntity user = userRepository.findUserEntityById(id);
-        if (user==null){
+        if (user == null) {
             throw new DataNotFoundException("User not found!");
         }
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -50,19 +46,19 @@ public class FileService {
         document.add(new Paragraph("Telefon raqami: " + user.getPhoneNumber()).setItalic());
         document.add(new Paragraph("Elektron pochtasi: " + user.getEmail()).setItalic());
         document.add(new Paragraph("Yashash manzili: " + user.getAddress()).setItalic());
-        if (user.getGender().equals(Gender.MALE)){
+        if (user.getGender().equals(Gender.MALE)) {
             document.add(new Paragraph("Jinsi: Erkak").setItalic());
         }
-        if (user.getGender().equals(Gender.FEMALE)){
+        if (user.getGender().equals(Gender.FEMALE)) {
             document.add(new Paragraph("Jinsi: Ayol").setItalic());
         }
-        if (user.getRole().equals(UserRole.USER)){
+        if (user.getRole().equals(UserRole.USER)) {
             document.add(new Paragraph("Tizimdagi o'rni: Foydalanuvchi").setItalic());
         }
-        if (user.getRole().equals(UserRole.ADMIN)){
+        if (user.getRole().equals(UserRole.ADMIN)) {
             document.add(new Paragraph("Tizimdagi o'rni: Admin").setItalic());
         }
-        if (user.getRole().equals(UserRole.OWNER)){
+        if (user.getRole().equals(UserRole.OWNER)) {
             document.add(new Paragraph("Tizimdagi o'rni: Direktor").setItalic());
         }
         document.add(new Paragraph("Holati: " + user.getUserStatus()).setItalic());
@@ -72,13 +68,6 @@ public class FileService {
 
         return out.toByteArray();
     }
-
-
-
-
-
-
-
 
 
     public byte[] generateUsersExcel(List<UserEntity> users) throws IOException {

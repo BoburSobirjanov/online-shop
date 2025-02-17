@@ -5,19 +5,19 @@ import lombok.Data;
 
 @Data
 @Builder
-public class StandardResponse<T>{
+public class StandardResponse<T> {
 
-  private Status status;
+    private Status status;
 
-  private String message;
+    private String message;
 
-  private T data;
+    private T data;
 
-  public static <T> StandardResponse<T> ok(String message, T data) {
-    return StandardResponse.<T>builder()
-            .status(Status.SUCCESS)
-            .message(message)
-            .data(data)
-            .build();
-  }
+    public static <T> StandardResponse<T> ok(String message, T data) {
+        return StandardResponse.<T>builder()
+                .status(Status.SUCCESS)
+                .message(message)
+                .data(data)
+                .build();
+    }
 }

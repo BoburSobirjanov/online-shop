@@ -25,9 +25,8 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user")
+@CrossOrigin
 public class UserController {
-
-
 
 
     private final UserService userService;
@@ -35,17 +34,12 @@ public class UserController {
     private final FileService fileService;
 
 
-
-
     @GetMapping("/get-user-by-id/{id}")
     public StandardResponse<UserForFrontDto> getById(
             @PathVariable UUID id
-            ){
+    ) {
         return userService.getById(id);
     }
-
-
-
 
 
     @DeleteMapping("/{id}/delete-by-id")
@@ -53,12 +47,9 @@ public class UserController {
     public StandardResponse<String> delete(
             @PathVariable UUID id,
             Principal principal
-    ){
+    ) {
         return userService.deleteUser(id, principal);
     }
-
-
-
 
 
     @PutMapping("/forgot-password")
@@ -66,12 +57,9 @@ public class UserController {
             @RequestParam String code,
             @RequestParam String newPassword,
             Principal principal
-    ){
+    ) {
         return userService.forgotPassword(code, newPassword, principal);
     }
-
-
-
 
 
     @PutMapping("/{id}/assign-to-admin")
@@ -79,12 +67,9 @@ public class UserController {
     public StandardResponse<UserForFrontDto> assignToAdmin(
             @PathVariable UUID id,
             Principal principal
-    ){
+    ) {
         return userService.assignToAdmin(id, principal);
     }
-
-
-
 
 
     @PutMapping("/update-profile/{id}")
@@ -92,12 +77,9 @@ public class UserController {
             @PathVariable UUID id,
             Principal principal,
             @RequestBody UserDto userDto
-            ){
+    ) {
         return userService.updateProfile(id, userDto, principal);
     }
-
-
-
 
 
     @GetMapping("/get-all-users")
@@ -109,22 +91,14 @@ public class UserController {
     }
 
 
-
-
-
-
     @PutMapping("/{id}/user-blocked")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
     public StandardResponse<String> userBlocked(
             @PathVariable UUID id,
             Principal principal
-    ){
+    ) {
         return userService.userBlocked(id, principal);
     }
-
-
-
-
 
 
     @PutMapping("/{id}/user-activated")
@@ -132,11 +106,9 @@ public class UserController {
     public StandardResponse<String> userActivated(
             @PathVariable UUID id,
             Principal principal
-    ){
+    ) {
         return userService.userActivated(id, principal);
     }
-
-
 
 
     @PutMapping("/get-all-user-by-status")
@@ -145,14 +117,10 @@ public class UserController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam String status
-    ){
-        Pageable pageable = PageRequest.of(page,size);
-        return userService.getUserByStatus(pageable,status);
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userService.getUserByStatus(pageable, status);
     }
-
-
-
-
 
 
     @GetMapping("/{id}/get-user-reviews")
@@ -161,17 +129,10 @@ public class UserController {
             @PathVariable UUID id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
-    ){
-        Pageable pageable = PageRequest.of(page,size);
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
         return reviewService.findReviewsByUserId(pageable, id);
     }
-
-
-
-
-
-
-
 
 
     @GetMapping("/{id}/get-pdf")
@@ -194,7 +155,6 @@ public class UserController {
     }
 
 
-
     @GetMapping("/get-all-excel")
     @PreAuthorize("hasRole('ADMIN') OR hasRole('OWNER')")
     public ResponseEntity<byte[]> getAllUsersExcel() {
@@ -214,26 +174,23 @@ public class UserController {
     }
 
 
-
     @DeleteMapping("/multi-delete")
     @PreAuthorize("hasRole('ADMIN')")
     public StandardResponse<String> multiDelete(
             @RequestBody List<String> id,
             Principal principal
-    ){
+    ) {
         return userService.multiDeleteById(id, principal);
     }
-
 
 
     @GetMapping("/search-by-number")
     @PreAuthorize("hasRole('ADMIN')")
     public StandardResponse<UserForFrontDto> searchByNumber(
             @RequestParam String number
-    ){
+    ) {
         return userService.searchUserByNumber(number);
     }
-
 
 
     @GetMapping("/search-by-name")
@@ -242,8 +199,8 @@ public class UserController {
             @RequestParam String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
-    ){
-        Pageable pageable = PageRequest.of(page,size);
-        return userService.searchByName(name,pageable);
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userService.searchByName(name, pageable);
     }
 }

@@ -23,14 +23,11 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/review")
+@CrossOrigin
 public class ReviewController {
 
 
-
     private final ReviewService reviewService;
-
-
-
 
 
     @PostMapping("/save-review")
@@ -38,8 +35,8 @@ public class ReviewController {
             @Valid
             @RequestBody ReviewDto reviewDto,
             Principal principal, BindingResult bindingResult
-            )throws RequestValidationException {
-        if (bindingResult.hasErrors()){
+    ) throws RequestValidationException {
+        if (bindingResult.hasErrors()) {
             List<ObjectError> allErrors = bindingResult.getAllErrors();
             throw new RequestValidationException(allErrors);
         }
@@ -47,25 +44,15 @@ public class ReviewController {
     }
 
 
-
-
-
-
     @GetMapping("/get-all-reviews-asc")
     @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
     public Page<ReviewForFrontDto> getAllReviewsByRatingAsc(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
-    ){
+    ) {
         Pageable pageable = PageRequest.of(page, size);
         return reviewService.getAllRatingByAsc(pageable);
     }
-
-
-
-
-
-
 
 
     @DeleteMapping("/{id}/delete-review")
@@ -73,14 +60,9 @@ public class ReviewController {
     public StandardResponse<String> delete(
             @PathVariable UUID id,
             Principal principal
-            ){
-      return  reviewService.delete(id, principal);
+    ) {
+        return reviewService.delete(id, principal);
     }
-
-
-
-
-
 
 
     @GetMapping("/get-all-reviews-desc")
@@ -88,20 +70,17 @@ public class ReviewController {
     public Page<ReviewForFrontDto> getAllReviewsByRatingDesc(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
-    ){
+    ) {
         Pageable pageable = PageRequest.of(page, size);
         return reviewService.getAllRatingByDesc(pageable);
     }
-
-
-
 
 
     @GetMapping("/get-all-reviews")
     public Page<ReviewForFrontDto> getAllReviews(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
-    ){
+    ) {
         Pageable pageable = PageRequest.of(page, size);
         return reviewService.getAllReviews(pageable);
     }

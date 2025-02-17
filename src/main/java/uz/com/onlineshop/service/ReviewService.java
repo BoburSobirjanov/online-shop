@@ -30,9 +30,7 @@ public class ReviewService {
     private final ReviewMapper reviewMapper;
 
 
-
-
-    public StandardResponse<ReviewForFrontDto> save(ReviewDto reviewDto, Principal principal){
+    public StandardResponse<ReviewForFrontDto> save(ReviewDto reviewDto, Principal principal) {
         ReviewsEntity reviewsEntity = modelMapper.map(reviewDto, ReviewsEntity.class);
         reviewsEntity.setComment(reviewDto.getComment());
         reviewsEntity.setRating(reviewDto.getRating());
@@ -41,19 +39,13 @@ public class ReviewService {
         ReviewsEntity save = reviewRepository.save(reviewsEntity);
         ReviewForFrontDto review = modelMapper.map(save, ReviewForFrontDto.class);
 
-        return StandardResponse.ok("Review saved",review);
+        return StandardResponse.ok("Review saved", review);
     }
 
 
-
-
-
-
-
-
-    public StandardResponse<String> delete(UUID id, Principal principal){
+    public StandardResponse<String> delete(UUID id, Principal principal) {
         ReviewsEntity reviews = reviewRepository.findReviewsEntityById(id);
-        if (reviews==null){
+        if (reviews == null) {
             throw new DataNotFoundException("Review not found!");
         }
         reviews.setDeleted(true);
@@ -61,54 +53,32 @@ public class ReviewService {
         reviews.setDeletedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         reviewRepository.save(reviews);
 
-        return StandardResponse.ok("Review deleted!","DELETED");
+        return StandardResponse.ok("Review deleted!", "DELETED");
     }
 
 
-
-
-
-
-
-
-
-    public Page<ReviewForFrontDto> getAllRatingByAsc(Pageable pageable){
+    public Page<ReviewForFrontDto> getAllRatingByAsc(Pageable pageable) {
         Page<ReviewsEntity> reviewsEntities = reviewRepository.findAllReviewsByRatingAsc(pageable);
         return reviewsEntities.map(reviewMapper::toDto);
 
     }
 
 
-
-
-
-
-
-
-    public Page<ReviewForFrontDto> getAllRatingByDesc(Pageable pageable){
+    public Page<ReviewForFrontDto> getAllRatingByDesc(Pageable pageable) {
         Page<ReviewsEntity> reviewsEntities = reviewRepository.findAllReviewsByRatingDesc(pageable);
         return reviewsEntities.map(reviewMapper::toDto);
 
     }
 
 
-
-
-
-
-
-    public Page<ReviewForFrontDto> getAllReviews(Pageable pageable){
+    public Page<ReviewForFrontDto> getAllReviews(Pageable pageable) {
         Page<ReviewsEntity> reviewsEntities = reviewRepository.findAllReviews(pageable);
         return reviewsEntities.map(reviewMapper::toDto);
     }
 
 
-
-
-
-
-    public Page<ReviewForFrontDto> findReviewsByUserId(Pageable pageable, UUID id){
-        Page<ReviewsEntity> reviewsEntities = reviewRepository.findReviewsEntityByUserId(pageable,id);
+    public Page<ReviewForFrontDto> findReviewsByUserId(Pageable pageable, UUID id) {
+        Page<ReviewsEntity> reviewsEntities = reviewRepository.findReviewsEntityByUserId(pageable, id);
         return reviewsEntities.map(reviewMapper::toDto);
     }
 }

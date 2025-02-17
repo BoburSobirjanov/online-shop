@@ -18,24 +18,20 @@ public interface CardRepository extends JpaRepository<CardEntity, UUID> {
     CardEntity findCardEntityByCardNumber(String number);
 
 
-
     @Query("select c from cards as c where c.isDeleted=false and c.id=?1")
     CardEntity findCardEntityById(UUID id);
-
 
 
     @Query("select c from cards as c where c.isDeleted=false and c.cardType=?1")
     Page<CardEntity> findCardEntityByCardType(Pageable pageable, String type);
 
 
-
     @Query("select c from cards as c where c.isDeleted=false")
     Page<CardEntity> findAllCards(Pageable pageable);
 
 
-
     @Query("select c from cards as c where c.isDeleted=false and c.userId=?1")
-    Page<CardEntity> findAllByUserId(Pageable pageable,UserEntity user);
+    Page<CardEntity> findAllByUserId(Pageable pageable, UserEntity user);
 
 
     @Query("select c from cards as c where c.isDeleted=false and c.userId=?1")

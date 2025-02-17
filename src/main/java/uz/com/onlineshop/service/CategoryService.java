@@ -34,48 +34,33 @@ public class CategoryService {
     private final CategoryMapper categoryMapper;
 
 
-
-
-
-
-    public StandardResponse<CategoryForFrontDto> save(CategoryDto categoryDto){
+    public StandardResponse<CategoryForFrontDto> save(CategoryDto categoryDto) {
         checkHasCategory(categoryDto.getName());
-        Category category =  modelMapper.map(categoryDto, Category.class);
+        Category category = modelMapper.map(categoryDto, Category.class);
         category.setDescription(categoryDto.getDescription());
         category.setName(categoryDto.getName());
         categoryRepository.save(category);
         CategoryForFrontDto categoryForFrontDto = modelMapper.map(category, CategoryForFrontDto.class);
-        return StandardResponse.ok("Category added successfully!",categoryForFrontDto);
+        return StandardResponse.ok("Category added successfully!", categoryForFrontDto);
     }
-
-
-
-
-
 
 
     private void checkHasCategory(String name) {
         Category category = categoryRepository.findCategoryByName(name);
-        if (category!=null){
+        if (category != null) {
             throw new NotAcceptableException("Category has already added!");
         }
     }
 
 
-
-
-
-
-
-
-    public StandardResponse<String> delete(UUID id, Principal principal){
+    public StandardResponse<String> delete(UUID id, Principal principal) {
         Category category = categoryRepository.findCategoryById(id);
-        if (category==null){
+        if (category == null) {
             throw new DataNotFoundException("Category not found!");
         }
         List<ProductEntity> productEntityList = productRepository.getProductEntityByCategoryId(id);
-        for (ProductEntity product:productEntityList) {
-            if(product.getCategoryId().equals(category.getId())){
+        for (ProductEntity product : productEntityList) {
+            if (product.getCategoryId().equals(category.getId())) {
                 throw new NotAcceptableException("Can not delete this category. Because it has product.");
             }
         }
@@ -84,42 +69,29 @@ public class CategoryService {
         category.setDeletedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         categoryRepository.save(category);
 
-        return StandardResponse.ok("Category deleted","DELETED");
+        return StandardResponse.ok("Category deleted", "DELETED");
     }
 
 
-
-
-
-
-
-
-    public StandardResponse<CategoryForFrontDto> getById(UUID id){
+    public StandardResponse<CategoryForFrontDto> getById(UUID id) {
         Category category = categoryRepository.findCategoryById(id);
-        if (category==null){
+        if (category == null) {
             throw new DataNotFoundException("Category not found!");
         }
         CategoryForFrontDto categoryForFrontDto = modelMapper.map(category, CategoryForFrontDto.class);
-        return StandardResponse.ok("This is category!",categoryForFrontDto);
+        return StandardResponse.ok("This is category!", categoryForFrontDto);
     }
 
 
-
-
-
-
-
-    public Page<CategoryForFrontDto> getAllCategories(Pageable pageable){
+    public Page<CategoryForFrontDto> getAllCategories(Pageable pageable) {
         Page<Category> categories = categoryRepository.findAllCategories(pageable);
         return categories.map(categoryMapper::toDto);
     }
 
 
-
-
-    public StandardResponse<CategoryForFrontDto> update(UUID id, CategoryDto categoryDto, Principal principal){
+    public StandardResponse<CategoryForFrontDto> update(UUID id, CategoryDto categoryDto, Principal principal) {
         Category category = categoryRepository.findCategoryById(id);
-        if (category==null){
+        if (category == null) {
             throw new DataNotFoundException("Category not found!");
         }
         category.setDescription(categoryDto.getDescription());
@@ -129,29 +101,27 @@ public class CategoryService {
         Category save = categoryRepository.save(category);
         CategoryForFrontDto categoryForFrontDto = modelMapper.map(save, CategoryForFrontDto.class);
 
-        return StandardResponse.ok("Category updated!",categoryForFrontDto);
+        return StandardResponse.ok("Category updated!", categoryForFrontDto);
     }
 
 
-
-
-    public StandardResponse<String> multiDeleteById(List<String> id, Principal principal){
+    public StandardResponse<String> multiDeleteById(List<String> id, Principal principal) {
         List<Category> categoryList = categoryRepository.findAllById(id
                 .stream()
                 .map(UUID::fromString)
                 .collect(Collectors.toList()));
 
-        if (categoryList.isEmpty()){
+        if (categoryList.isEmpty()) {
             throw new DataNotFoundException("Category not found!");
         }
 
-        for (Category category: categoryList) {
+        for (Category category : categoryList) {
             category.setDeletedTime(LocalDateTime.now());
             category.setDeleted(true);
             category.setDeletedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
             categoryRepository.save(category);
         }
 
-        return StandardResponse.ok("Categories deleted","DELETED");
+        return StandardResponse.ok("Categories deleted", "DELETED");
     }
 }

@@ -32,53 +32,41 @@ public class CardService {
     private final CardMapper cardMapper;
 
 
-    public StandardResponse<CardForFrontDto> save(CardDto cardDto, Principal principal){
+    public StandardResponse<CardForFrontDto> save(CardDto cardDto, Principal principal) {
         checkHasCard(cardDto.getCardNumber());
         CardEntity card = modelMapper.map(cardDto, CardEntity.class);
-        if (cardDto.getCardNumber()!=null && cardDto.getCardNumber().length()>16){
+        if (cardDto.getCardNumber() != null && cardDto.getCardNumber().length() > 16) {
             throw new NotAcceptableException("Field value cannot exceed 16 characters!");
         }
         card.setCardNumber(cardDto.getCardNumber());
         card.setExpireDate(cardDto.getExpireDate());
-        if (cardDto.getCardBalance()<0){
+        if (cardDto.getCardBalance() < 0) {
             throw new NotAcceptableException("Balance can not be less than 0");
         }
         card.setCardBalance(cardDto.getCardBalance());
         try {
             card.setCardType(CardType.valueOf(cardDto.getCardType()));
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new NotAcceptableException("Wrong card type!");
         }
         card.setUserId(userRepository.findUserEntityByEmail(principal.getName()));
         CardEntity save = cardRepository.save(card);
         CardForFrontDto cardForFrontDto = modelMapper.map(save, CardForFrontDto.class);
-        return StandardResponse.ok("Card added!",cardForFrontDto);
+        return StandardResponse.ok("Card added!", cardForFrontDto);
     }
 
 
-
-
-
-
-
-
-    public void checkHasCard(String number){
+    public void checkHasCard(String number) {
         CardEntity card = cardRepository.findCardEntityByCardNumber(number);
-        if (card!=null){
+        if (card != null) {
             throw new DataHasAlreadyExistException("Card has already added!");
         }
     }
 
 
-
-
-
-
-
-
-    public StandardResponse<String> delete(UUID id, Principal principal){
+    public StandardResponse<String> delete(UUID id, Principal principal) {
         CardEntity card = cardRepository.findCardEntityById(id);
-        if (card==null){
+        if (card == null) {
             throw new DataNotFoundException("Card not found!");
         }
         card.setDeleted(true);
@@ -86,77 +74,57 @@ public class CardService {
         card.setDeletedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         cardRepository.save(card);
 
-        return StandardResponse.ok("Card deleted","DELETED");
+        return StandardResponse.ok("Card deleted", "DELETED");
     }
 
 
-
-
-
-
-
-    public Page<CardForFrontDto> getCardsByType(Pageable pageable, String type){
+    public Page<CardForFrontDto> getCardsByType(Pageable pageable, String type) {
         Page<CardEntity> cardEntities = cardRepository.findCardEntityByCardType(pageable, type);
         return cardEntities.map(cardMapper::toDto);
     }
 
 
-
-
-
-
-    public Page<CardForFrontDto> getAllCards(Pageable pageable){
+    public Page<CardForFrontDto> getAllCards(Pageable pageable) {
         Page<CardEntity> cardEntities = cardRepository.findAllCards(pageable);
         return cardEntities.map(cardMapper::toDto);
     }
 
 
-
-
-
-
-    public StandardResponse<CardForFrontDto> getById(UUID id){
+    public StandardResponse<CardForFrontDto> getById(UUID id) {
         CardEntity card = cardRepository.findCardEntityById(id);
-        if (card==null){
+        if (card == null) {
             throw new DataNotFoundException("Card not found!");
         }
         CardForFrontDto cardForFrontDto = modelMapper.map(card, CardForFrontDto.class);
-        return StandardResponse.ok("This is card!",cardForFrontDto);
+        return StandardResponse.ok("This is card!", cardForFrontDto);
     }
 
 
-
-
-
-    public StandardResponse<String> fillCardBalance(UUID id,Double balance){
+    public StandardResponse<String> fillCardBalance(UUID id, Double balance) {
         CardEntity card = cardRepository.findCardEntityById(id);
-        if (card==null){
+        if (card == null) {
             throw new DataNotFoundException("Card not found!");
         }
-        card.setCardBalance(card.getCardBalance()+balance);
+        card.setCardBalance(card.getCardBalance() + balance);
         cardRepository.save(card);
-        return StandardResponse.ok("Card's balance filled","FILLED BALANCE");
+        return StandardResponse.ok("Card's balance filled", "FILLED BALANCE");
     }
 
 
-
-
-
-    public Page<CardForFrontDto> getMyCards(Pageable pageable, Principal principal){
+    public Page<CardForFrontDto> getMyCards(Pageable pageable, Principal principal) {
         UserEntity user = userRepository.findUserEntityByEmail(principal.getName());
-        Page<CardEntity> cards = cardRepository.findAllByUserId(pageable,user);
+        Page<CardEntity> cards = cardRepository.findAllByUserId(pageable, user);
 
         return cards.map(cardMapper::toDto);
     }
 
 
-
-    public Page<CardForFrontDto> getUsersCards(Pageable pageable, UUID userId){
+    public Page<CardForFrontDto> getUsersCards(Pageable pageable, UUID userId) {
         UserEntity user = userRepository.findUserEntityById(userId);
-        if (user==null){
+        if (user == null) {
             throw new DataNotFoundException("User not found!");
         }
-        Page<CardEntity> cardEntityByUserId = cardRepository.findCardEntityByUserId(pageable,user);
+        Page<CardEntity> cardEntityByUserId = cardRepository.findCardEntityByUserId(pageable, user);
 
         return cardEntityByUserId.map(cardMapper::toDto);
     }

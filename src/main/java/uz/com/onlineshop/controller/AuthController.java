@@ -20,6 +20,7 @@ import uz.com.onlineshop.standard.StandardResponse;
 import uz.com.onlineshop.service.MailSendingService;
 import uz.com.onlineshop.service.UserService;
 
+import java.security.Principal;
 import java.util.List;
 
 
@@ -82,5 +83,15 @@ public class AuthController {
             @RequestParam String email
     ) {
         return mailSendingService.sendMessage(email);
+    }
+
+
+    @PutMapping("/forgot-password")
+    public StandardResponse<String> forgotPassword(
+            @RequestParam String code,
+            @RequestParam String newPassword,
+            Principal principal
+    ) {
+        return userService.forgotPassword(code, newPassword, principal);
     }
 }

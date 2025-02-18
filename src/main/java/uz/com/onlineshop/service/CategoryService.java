@@ -1,7 +1,6 @@
 package uz.com.onlineshop.service;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,6 @@ import java.util.stream.Collectors;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final ModelMapper modelMapper;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final CategoryMapper categoryMapper;
@@ -36,11 +34,11 @@ public class CategoryService {
 
     public StandardResponse<CategoryForFrontDto> save(CategoryDto categoryDto) {
         checkHasCategory(categoryDto.getName());
-        Category category = modelMapper.map(categoryDto, Category.class);
+        Category category = categoryMapper.toEntity(categoryDto);
         category.setDescription(categoryDto.getDescription());
         category.setName(categoryDto.getName());
         categoryRepository.save(category);
-        CategoryForFrontDto categoryForFrontDto = modelMapper.map(category, CategoryForFrontDto.class);
+        CategoryForFrontDto categoryForFrontDto = categoryMapper.toDto(category);
         return StandardResponse.ok("Category added successfully!", categoryForFrontDto);
     }
 
@@ -78,7 +76,7 @@ public class CategoryService {
         if (category == null) {
             throw new DataNotFoundException("Category not found!");
         }
-        CategoryForFrontDto categoryForFrontDto = modelMapper.map(category, CategoryForFrontDto.class);
+        CategoryForFrontDto categoryForFrontDto =categoryMapper.toDto(category);
         return StandardResponse.ok("This is category!", categoryForFrontDto);
     }
 
@@ -99,7 +97,7 @@ public class CategoryService {
         category.setUpdatedTime(LocalDateTime.now());
         category.setUpdatedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         Category save = categoryRepository.save(category);
-        CategoryForFrontDto categoryForFrontDto = modelMapper.map(save, CategoryForFrontDto.class);
+        CategoryForFrontDto categoryForFrontDto = categoryMapper.toDto(save);
 
         return StandardResponse.ok("Category updated!", categoryForFrontDto);
     }

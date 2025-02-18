@@ -1,9 +1,6 @@
 package uz.com.onlineshop.model.entity.user;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -16,10 +13,7 @@ import uz.com.onlineshop.model.enums.Gender;
 import uz.com.onlineshop.model.enums.UserRole;
 import uz.com.onlineshop.model.enums.UserStatus;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 
 @Entity(name = "users")
@@ -60,9 +54,10 @@ public class UserEntity extends BaseEntity implements UserDetails {
     @NotBlank(message = "Address is required")
     private String address;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
+    private Set<UserRole> role;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -80,7 +75,9 @@ public class UserEntity extends BaseEntity implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        for (UserRole userRole : role) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + userRole.name()));
+        }
         return authorities;
     }
 

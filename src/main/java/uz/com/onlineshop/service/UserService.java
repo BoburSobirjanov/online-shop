@@ -1,7 +1,6 @@
 package uz.com.onlineshop.service;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,7 +34,6 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final VerificationRepository verificationRepository;
@@ -44,7 +42,7 @@ public class UserService {
 
     public StandardResponse<JwtResponse> signUp(UserDto userDto) {
         checkUserEmailAndPhoneNumber(userDto.getEmail(), userDto.getPhoneNumber());
-        UserEntity userEntity = modelMapper.map(userDto, UserEntity.class);
+        UserEntity userEntity = userMapper.toEntity(userDto);
         userEntity.setPassword(passwordEncoder.encode(userDto.getPassword()));
         try {
             userEntity.setGender(Gender.valueOf(userDto.getGender()));
@@ -52,7 +50,7 @@ public class UserService {
             throw new NotAcceptableException("Gender not found");
         }
         userEntity.setAddress(userDto.getAddress());
-        userEntity.setRole(UserRole.USER);
+        userEntity.getRole().add(UserRole.USER);
         userEntity.setFullName(userDto.getFullName());
         userEntity.setUsername(userDto.getUsername());
         userEntity.setEmail(userDto.getEmail());
@@ -61,7 +59,7 @@ public class UserService {
         userRepository.save(userEntity);
         String accessToken = jwtService.generateAccessToken(userEntity);
         String refreshToken = jwtService.generateRefreshToken(userEntity);
-        UserForFrontDto userForFrontDto = modelMapper.map(userEntity, UserForFrontDto.class);
+        UserForFrontDto userForFrontDto = userMapper.toDto(userEntity);
         JwtResponse jwtResponse = JwtResponse.builder()
                 .userForFrontDto(userForFrontDto)
                 .accessToken(accessToken)
@@ -90,7 +88,7 @@ public class UserService {
         if (passwordEncoder.matches(loginDto.getPassword(), userEntity.getPassword())) {
             String accessToken = jwtService.generateAccessToken(userEntity);
             String refreshToken = jwtService.generateRefreshToken(userEntity);
-            UserForFrontDto userForFrontDto = modelMapper.map(userEntity, UserForFrontDto.class);
+            UserForFrontDto userForFrontDto = userMapper.toDto(userEntity);
             JwtResponse jwtResponse = JwtResponse.builder()
                     .refreshToken(refreshToken)
                     .accessToken(accessToken)
@@ -108,7 +106,7 @@ public class UserService {
         if (userEntity == null) {
             throw new DataNotFoundException("User not found!");
         }
-        UserForFrontDto userForFrontDto = modelMapper.map(userEntity, UserForFrontDto.class);
+        UserForFrontDto userForFrontDto = userMapper.toDto(userEntity);
         return StandardResponse.ok("This is user", userForFrontDto);
     }
 
@@ -133,10 +131,10 @@ public class UserService {
         if (userEntity == null) {
             throw new DataNotFoundException("User not found!");
         }
-        userEntity.setRole(UserRole.ADMIN);
+        userEntity.getRole().add(UserRole.ADMIN);
         userEntity.setChangeRoleBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         UserEntity save = userRepository.save(userEntity);
-        UserForFrontDto userForFrontDto = modelMapper.map(save, UserForFrontDto.class);
+        UserForFrontDto userForFrontDto = userMapper.toDto(save);
 
         return StandardResponse.ok("User's role changed!", userForFrontDto);
     }
@@ -177,7 +175,7 @@ public class UserService {
         }
         userEntity.setUpdatedTime(LocalDateTime.now());
         UserEntity save = userRepository.save(userEntity);
-        UserForFrontDto userForFrontDto = modelMapper.map(save, UserForFrontDto.class);
+        UserForFrontDto userForFrontDto = userMapper.toDto(save);
         return StandardResponse.ok("User updated!", userForFrontDto);
     }
 
@@ -255,7 +253,7 @@ public class UserService {
         if (user == null) {
             throw new DataNotFoundException("User not found!");
         }
-        UserForFrontDto userForFrontDto = modelMapper.map(user, UserForFrontDto.class);
+        UserForFrontDto userForFrontDto = userMapper.toDto(user);
 
         return StandardResponse.ok("This is user", userForFrontDto);
     }

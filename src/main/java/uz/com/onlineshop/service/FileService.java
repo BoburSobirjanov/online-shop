@@ -52,13 +52,13 @@ public class FileService {
         if (user.getGender().equals(Gender.FEMALE)) {
             document.add(new Paragraph("Jinsi: Ayol").setItalic());
         }
-        if (user.getRole().equals(UserRole.USER)) {
+        if (user.getRole().contains(UserRole.USER) && !user.getRole().contains(UserRole.ADMIN) && !user.getRole().contains(UserRole.OWNER) ) {
             document.add(new Paragraph("Tizimdagi o'rni: Foydalanuvchi").setItalic());
         }
-        if (user.getRole().equals(UserRole.ADMIN)) {
+        if (!user.getRole().contains(UserRole.USER) && user.getRole().contains(UserRole.ADMIN) && !user.getRole().contains(UserRole.OWNER) ) {
             document.add(new Paragraph("Tizimdagi o'rni: Admin").setItalic());
         }
-        if (user.getRole().equals(UserRole.OWNER)) {
+        if (!user.getRole().contains(UserRole.USER) && !user.getRole().contains(UserRole.ADMIN) && user.getRole().contains(UserRole.OWNER) ) {
             document.add(new Paragraph("Tizimdagi o'rni: Direktor").setItalic());
         }
         document.add(new Paragraph("Holati: " + user.getUserStatus()).setItalic());

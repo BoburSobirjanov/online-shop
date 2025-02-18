@@ -4,6 +4,7 @@ import lombok.*;
 import uz.com.onlineshop.model.enums.Gender;
 import uz.com.onlineshop.model.enums.UserRole;
 
+import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -25,7 +26,7 @@ public class UserForFrontDto {
 
     private String address;
 
-    private UserRole role;
+    private Set<UserRole> role;
 
     private Gender gender;
 }

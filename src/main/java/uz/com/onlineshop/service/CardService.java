@@ -1,7 +1,6 @@
 package uz.com.onlineshop.service;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,13 +27,12 @@ public class CardService {
 
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
     private final CardMapper cardMapper;
 
 
     public StandardResponse<CardForFrontDto> save(CardDto cardDto, Principal principal) {
         checkHasCard(cardDto.getCardNumber());
-        CardEntity card = modelMapper.map(cardDto, CardEntity.class);
+        CardEntity card = cardMapper.toEntity(cardDto);
         if (cardDto.getCardNumber() != null && cardDto.getCardNumber().length() > 16) {
             throw new NotAcceptableException("Field value cannot exceed 16 characters!");
         }
@@ -49,9 +47,9 @@ public class CardService {
         } catch (Exception e) {
             throw new NotAcceptableException("Wrong card type!");
         }
-        card.setUserId(userRepository.findUserEntityByEmail(principal.getName()));
+        card.setUser(userRepository.findUserEntityByEmail(principal.getName()));
         CardEntity save = cardRepository.save(card);
-        CardForFrontDto cardForFrontDto = modelMapper.map(save, CardForFrontDto.class);
+        CardForFrontDto cardForFrontDto = cardMapper.toDto(save);
         return StandardResponse.ok("Card added!", cardForFrontDto);
     }
 
@@ -95,7 +93,7 @@ public class CardService {
         if (card == null) {
             throw new DataNotFoundException("Card not found!");
         }
-        CardForFrontDto cardForFrontDto = modelMapper.map(card, CardForFrontDto.class);
+        CardForFrontDto cardForFrontDto = cardMapper.toDto(card);
         return StandardResponse.ok("This is card!", cardForFrontDto);
     }
 

@@ -14,6 +14,6 @@ public class CreditDto {
 
     private Integer creditMonths;
 
-    private String order;
+    private String orderId;
 
 }

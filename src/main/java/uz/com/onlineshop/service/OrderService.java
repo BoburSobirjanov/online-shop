@@ -1,7 +1,6 @@
 package uz.com.onlineshop.service;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -37,7 +36,6 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
     private final BasketRepository basketRepository;
     private final CreditRepository creditRepository;
     private final OrderMapper orderMapper;
@@ -45,7 +43,7 @@ public class OrderService {
 
     public StandardResponse<OrderForFrontDto> save(OrderDto orderDto, Principal principal) {
         Optional<Basket> basket = basketRepository.findBasketById(UUID.fromString(orderDto.getBasketId()));
-        OrderEntity order = modelMapper.map(orderDto, OrderEntity.class);
+        OrderEntity order = orderMapper.toEntity(orderDto);
         order.setOrderStatus(OrderStatus.PENDING);
         order.setBillingAddress(orderDto.getBillingAddress());
         order.setShippingAddress(orderDto.getShippingAddress());
@@ -59,7 +57,7 @@ public class OrderService {
         order.setUserId(userRepository.findUserEntityByEmail(principal.getName()));
         OrderEntity save = orderRepository.save(order);
         basketRepository.delete(basket.get());
-        OrderForFrontDto orderForFrontDto = modelMapper.map(save, OrderForFrontDto.class);
+        OrderForFrontDto orderForFrontDto = orderMapper.toDto(save);
 
         return StandardResponse.ok("Order saved!", orderForFrontDto);
     }
@@ -70,7 +68,7 @@ public class OrderService {
         if (order == null) {
             throw new DataNotFoundException("Order not found!");
         }
-        OrderForFrontDto orderForFrontDto = modelMapper.map(order, OrderForFrontDto.class);
+        OrderForFrontDto orderForFrontDto = orderMapper.toDto(order);
         return StandardResponse.ok("This is order", orderForFrontDto);
     }
 
@@ -117,7 +115,7 @@ public class OrderService {
         }
         order.setOrderStatus(OrderStatus.CANCELLED);
         OrderEntity save = orderRepository.save(order);
-        OrderForFrontDto orderForFrontDto = modelMapper.map(save, OrderForFrontDto.class);
+        OrderForFrontDto orderForFrontDto = orderMapper.toDto(save);
 
         return StandardResponse.ok("Order canceled!", orderForFrontDto);
     }
@@ -135,7 +133,7 @@ public class OrderService {
         order.setUpdatedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         order.setUserId(userRepository.findUserEntityByEmail(principal.getName()));
         OrderEntity save = orderRepository.save(order);
-        OrderForFrontDto orderForFrontDto = modelMapper.map(save, OrderForFrontDto.class);
+        OrderForFrontDto orderForFrontDto = orderMapper.toDto(save);
 
         return StandardResponse.ok("Order updated!", orderForFrontDto);
     }

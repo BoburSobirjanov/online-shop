@@ -3,7 +3,6 @@ package uz.com.onlineshop.service;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,7 +33,6 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final ModelMapper modelMapper;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final ProductMapper productMapper;
@@ -64,7 +62,7 @@ public class ProductService {
 
     public StandardResponse<ProductForFrontDto> save(ProductDto productDto) {
         Category category = categoryRepository.findCategoryById(UUID.fromString(productDto.getCategoryId()));
-        ProductEntity product = modelMapper.map(productDto, ProductEntity.class);
+        ProductEntity product = productMapper.toEntity(productDto);
         product.setDescription(productDto.getDescription());
         product.setBrand(productDto.getBrand());
         product.setColor(productDto.getColor());
@@ -87,7 +85,7 @@ public class ProductService {
         product.setIsSale(0);
         product.setViewCount(0);
         ProductEntity save = productRepository.save(product);
-        ProductForFrontDto productForFrontDto = modelMapper.map(save, ProductForFrontDto.class);
+        ProductForFrontDto productForFrontDto = productMapper.toDto(save);
         return StandardResponse.ok("Product added!", productForFrontDto);
     }
 
@@ -144,7 +142,7 @@ public class ProductService {
         if (productEntity == null) {
             throw new DataNotFoundException("Product not found!");
         }
-        ProductForFrontDto product = modelMapper.map(productEntity, ProductForFrontDto.class);
+        ProductForFrontDto product = productMapper.toDto(productEntity);
         return StandardResponse.ok("This is product", product);
     }
 
@@ -174,7 +172,7 @@ public class ProductService {
         productEntity.setUpdatedTime(LocalDateTime.now());
         productEntity.setUpdatedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         ProductEntity save = productRepository.save(productEntity);
-        ProductForFrontDto productForFrontDto = modelMapper.map(save, ProductForFrontDto.class);
+        ProductForFrontDto productForFrontDto = productMapper.toDto(save);
 
         return StandardResponse.ok("Product updated!", productForFrontDto);
     }
@@ -199,7 +197,7 @@ public class ProductService {
         productEntity.setUpdatedTime(LocalDateTime.now());
         productEntity.setUpdatedBy(userRepository.findUserEntityByEmail(principal.getName()).getId());
         ProductEntity save = productRepository.save(productEntity);
-        ProductForFrontDto productForFrontDto = modelMapper.map(save, ProductForFrontDto.class);
+        ProductForFrontDto productForFrontDto = productMapper.toDto(save);
 
         return StandardResponse.ok("Sale added in this product!", productForFrontDto);
 
@@ -217,7 +215,7 @@ public class ProductService {
         productEntity.setUpdatedTime(LocalDateTime.now());
         productEntity.setUpdatedBy(user.getId());
         ProductEntity save = productRepository.save(productEntity);
-        ProductForFrontDto productForFrontDto = modelMapper.map(save, ProductForFrontDto.class);
+        ProductForFrontDto productForFrontDto = productMapper.toDto(save);
 
         return StandardResponse.ok("Sale removed from product!", productForFrontDto);
     }

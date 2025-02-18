@@ -16,10 +16,10 @@ import uz.com.onlineshop.model.entity.product.ProductEntity;
 public class ReviewsEntity extends BaseEntity {
 
     @ManyToOne
-    private ProductEntity productId;
+    private ProductEntity product;
 
     @ManyToOne
-    private UserEntity userId;
+    private UserEntity user;
 
     private Integer rating;
 

@@ -39,7 +39,7 @@ public class AuditLogAspect {
 
         if (requestURI.startsWith("/swagger") ||
                 requestURI.startsWith("/v3/api-docs") ||
-                requestURI.startsWith("/brb/auth")) {
+                requestURI.startsWith("/api/v1/auth")) {
             return joinPoint.proceed();
         }
 

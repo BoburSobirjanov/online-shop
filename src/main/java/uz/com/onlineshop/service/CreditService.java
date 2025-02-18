@@ -1,7 +1,6 @@
 package uz.com.onlineshop.service;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -36,22 +35,21 @@ public class CreditService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final CardRepository cardRepository;
-    private final ModelMapper modelMapper;
     private final CreditMapper creditMapper;
 
 
     public StandardResponse<CreditForFrontDto> save(CreditDto creditDto, Principal principal) {
-        OrderEntity order = orderRepository.findOrderEntityById(UUID.fromString(creditDto.getOrder()));
+        OrderEntity order = orderRepository.findOrderEntityById(UUID.fromString(creditDto.getOrderId()));
         if (order.getOrderStatus() == OrderStatus.PAID || order.getOrderStatus() == OrderStatus.CANCELLED) {
             throw new UserBadRequestException("Can not create credit for this order. Because order has already paid or canceled!");
         }
         Double creditAmount = order.getTotalAmount() + (((order.getTotalAmount() * (100 + creditDto.getInterestRate()) / 100) - order.getTotalAmount()) * creditDto.getCreditMonths() / 12);
-        Credit credit = modelMapper.map(creditDto, Credit.class);
+        Credit credit = creditMapper.toEntity(creditDto);
         credit.setUser(userRepository.findUserEntityByEmail(principal.getName()));
         credit.setCreditMonths(creditDto.getCreditMonths());
         credit.setInterestRate(creditDto.getInterestRate());
         credit.setCreditStatus(CreditStatus.PROCESS);
-        credit.setOrder(orderRepository.findOrderEntityById(UUID.fromString(creditDto.getOrder())));
+        credit.setOrder(orderRepository.findOrderEntityById(UUID.fromString(creditDto.getOrderId())));
         credit.setStartTime(LocalDateTime.now());
         credit.setMonthlyPayment(creditAmount / creditDto.getCreditMonths());
         credit.setEndTime(LocalDateTime.now().plusMonths(creditDto.getCreditMonths()));
@@ -62,7 +60,7 @@ public class CreditService {
         orderRepository.save(order);
         Credit save = creditRepository.save(credit);
 
-        CreditForFrontDto creditForFrontDto = modelMapper.map(save, CreditForFrontDto.class);
+        CreditForFrontDto creditForFrontDto = creditMapper.toDto(save);
 
         return StandardResponse.ok("Credit saved!", creditForFrontDto);
     }
@@ -73,7 +71,7 @@ public class CreditService {
         if (credit.isEmpty()) {
             throw new DataNotFoundException("Credit not found!");
         }
-        CreditForFrontDto creditForFrontDto = modelMapper.map(credit, CreditForFrontDto.class);
+        CreditForFrontDto creditForFrontDto = creditMapper.toDto(credit.get());
 
         return StandardResponse.ok("This is credit!", creditForFrontDto);
     }
@@ -123,7 +121,7 @@ public class CreditService {
             save.setCreditStatus(CreditStatus.COMPLETED);
             creditRepository.save(save);
         }
-        CreditForFrontDto creditForFrontDto = modelMapper.map(save, CreditForFrontDto.class);
+        CreditForFrontDto creditForFrontDto = creditMapper.toDto(save);
 
         return StandardResponse.ok(amount + " UZS paid for credit!", creditForFrontDto);
     }

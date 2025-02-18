@@ -34,6 +34,6 @@ public class CardEntity extends BaseEntity {
     private Double cardBalance;
 
     @ManyToOne
-    private UserEntity userId;
+    private UserEntity user;
 
 }

@@ -29,6 +29,6 @@ public interface ReviewRepository extends JpaRepository<ReviewsEntity, UUID> {
     Page<ReviewsEntity> findAllReviews(Pageable pageable);
 
 
-    @Query("select r from reviews as r where r.isDeleted=false and r.userId=?1")
+    @Query("select r from reviews as r where r.isDeleted=false and r.user=?1")
     Page<ReviewsEntity> findReviewsEntityByUserId(Pageable pageable, UUID userId);
 }

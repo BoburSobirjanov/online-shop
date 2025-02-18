@@ -52,16 +52,6 @@ public class UserController {
     }
 
 
-    @PutMapping("/forgot-password")
-    public StandardResponse<String> forgotPassword(
-            @RequestParam String code,
-            @RequestParam String newPassword,
-            Principal principal
-    ) {
-        return userService.forgotPassword(code, newPassword, principal);
-    }
-
-
     @PutMapping("/{id}/assign-to-admin")
     @PreAuthorize("hasRole('OWNER')")
     public StandardResponse<UserForFrontDto> assignToAdmin(

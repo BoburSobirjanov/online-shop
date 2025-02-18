@@ -1,9 +1,9 @@
 package uz.com.onlineshop.service;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uz.com.onlineshop.mapper.BasketMapper;
 import uz.com.onlineshop.model.dto.request.BasketDto;
 import uz.com.onlineshop.model.dto.response.BasketForFrontDto;
 import uz.com.onlineshop.model.entity.basket.Basket;
@@ -23,7 +23,7 @@ import java.util.UUID;
 public class BasketService {
 
     private final BasketRepository basketRepository;
-    private final ModelMapper modelMapper;
+    private final BasketMapper basketMapper;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
@@ -36,11 +36,11 @@ public class BasketService {
             ProductEntity product = productRepository.findProductEntityById(UUID.fromString(id));
             productEntities.add(product);
         }
-        Basket basket = modelMapper.map(basketDto, Basket.class);
+        Basket basket = basketMapper.toEntity(basketDto);
         basket.setProduct(productEntities);
         basket.setUser(userRepository.findUserEntityByEmail(principal.getName()));
         Basket save = basketRepository.save(basket);
-        BasketForFrontDto basketForFrontDto = modelMapper.map(save, BasketForFrontDto.class);
+        BasketForFrontDto basketForFrontDto =basketMapper.toDto(save);
 
         return StandardResponse.ok("Basket created", basketForFrontDto);
     }

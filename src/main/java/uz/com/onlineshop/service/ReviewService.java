@@ -1,7 +1,6 @@
 package uz.com.onlineshop.service;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,18 +25,17 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
-    private final ModelMapper modelMapper;
     private final ReviewMapper reviewMapper;
 
 
     public StandardResponse<ReviewForFrontDto> save(ReviewDto reviewDto, Principal principal) {
-        ReviewsEntity reviewsEntity = modelMapper.map(reviewDto, ReviewsEntity.class);
+        ReviewsEntity reviewsEntity = reviewMapper.toEntity(reviewDto);
         reviewsEntity.setComment(reviewDto.getComment());
         reviewsEntity.setRating(reviewDto.getRating());
-        reviewsEntity.setUserId(userRepository.findUserEntityByEmail(principal.getName()));
-        reviewsEntity.setProductId(productRepository.findProductEntityById(UUID.fromString(reviewDto.getProductId())));
+        reviewsEntity.setUser(userRepository.findUserEntityByEmail(principal.getName()));
+        reviewsEntity.setProduct(productRepository.findProductEntityById(UUID.fromString(reviewDto.getProductId())));
         ReviewsEntity save = reviewRepository.save(reviewsEntity);
-        ReviewForFrontDto review = modelMapper.map(save, ReviewForFrontDto.class);
+        ReviewForFrontDto review = reviewMapper.toDto(save);
 
         return StandardResponse.ok("Review saved", review);
     }
